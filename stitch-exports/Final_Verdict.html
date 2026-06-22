@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>VerdictAI | Final Verdict - NVIDIA</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.3s ease;
+        }
+        .glass-card:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.12);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .status-pill {
+            background: rgba(78, 222, 163, 0.1);
+            border: 1px solid rgba(78, 222, 163, 0.2);
+            color: #4edea3;
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-lowest": "#0e0e0e",
+                        "surface-bright": "#3a3939",
+                        "surface": "#131313",
+                        "on-primary-fixed": "#1a1c1c",
+                        "on-surface": "#e5e2e1",
+                        "on-tertiary-fixed-variant": "#004395",
+                        "surface-variant": "#353534",
+                        "on-tertiary": "#002e6a",
+                        "background": "#131313",
+                        "outline-variant": "#444748",
+                        "inverse-on-surface": "#313030",
+                        "error": "#ffb4ab",
+                        "secondary-fixed": "#6ffbbe",
+                        "tertiary-fixed-dim": "#adc6ff",
+                        "secondary": "#4edea3",
+                        "on-surface-variant": "#c4c7c8",
+                        "on-tertiary-container": "#0060ce",
+                        "surface-container": "#201f1f",
+                        "tertiary-container": "#d8e2ff",
+                        "error-container": "#93000a",
+                        "on-primary-container": "#636565",
+                        "on-secondary-fixed": "#002113",
+                        "primary-fixed": "#e2e2e2",
+                        "primary-container": "#e2e2e2",
+                        "inverse-surface": "#e5e2e1",
+                        "surface-container-highest": "#353534",
+                        "primary": "#ffffff",
+                        "surface-container-low": "#1c1b1b",
+                        "on-background": "#e5e2e1",
+                        "inverse-primary": "#5d5f5f",
+                        "surface-tint": "#c6c6c7",
+                        "tertiary": "#ffffff",
+                        "primary-fixed-dim": "#c6c6c7",
+                        "on-error-container": "#ffdad6",
+                        "on-secondary-container": "#00311f",
+                        "on-tertiary-fixed": "#001a42",
+                        "on-secondary-fixed-variant": "#005236",
+                        "secondary-container": "#00a572",
+                        "secondary-fixed-dim": "#4edea3",
+                        "on-error": "#690005",
+                        "on-primary-fixed-variant": "#454747",
+                        "outline": "#8e9192",
+                        "on-secondary": "#003824",
+                        "surface-container-high": "#2a2a2a",
+                        "on-primary": "#2f3131",
+                        "surface-dim": "#131313",
+                        "tertiary-fixed": "#d8e2ff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "base": "4px",
+                        "gutter": "24px",
+                        "margin-safe": "32px",
+                        "md": "24px",
+                        "xs": "8px",
+                        "sm": "16px",
+                        "lg": "40px",
+                        "xl": "64px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "headline-md-mobile": ["Inter"],
+                        "label-mono": ["JetBrains Mono"],
+                        "headline-sm": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "body-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-md": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                        "headline-md-mobile": ["20px", {"lineHeight": "1.2", "fontWeight": "600"}],
+                        "label-mono": ["12px", {"lineHeight": "1.0", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                        "headline-sm": ["18px", {"lineHeight": "1.4", "fontWeight": "500"}],
+                        "headline-md": ["24px", {"lineHeight": "1.3", "letterSpacing": "-0.01em", "fontWeight": "500"}],
+                        "body-lg": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-background text-on-surface font-body-md selection:bg-primary selection:text-on-primary">
+<!-- SideNavBar (JSON Derived) -->
+<aside class="fixed left-0 top-0 h-full w-64 bg-surface-container-low border-r border-white/5 flex flex-col p-sm z-50">
+<div class="mb-lg flex flex-col gap-xs">
+<div class="flex items-center gap-xs px-xs">
+<div class="w-8 h-8 rounded bg-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary text-[20px]" style="font-variation-settings: 'FILL' 1;">gavel</span>
+</div>
+<div>
+<h1 class="font-headline-sm text-headline-sm font-semibold text-primary">VerdictAI</h1>
+<p class="font-label-mono text-[10px] uppercase tracking-wider text-on-surface-variant">Institutional Research</p>
+</div>
+</div>
+<button class="mt-md w-full bg-primary text-on-primary font-label-mono py-sm rounded-lg hover:opacity-90 transition-opacity active:scale-[0.98]">
+                New Analysis
+            </button>
+</div>
+<nav class="flex-1 flex flex-col gap-1">
+<!-- Navigation Items Mapping from JSON tab_labels -->
+<a class="flex items-center gap-sm px-sm py-xs text-on-surface-variant hover:bg-white/5 rounded-lg transition-colors group" href="#">
+<span class="material-symbols-outlined text-[20px] group-hover:text-primary transition-colors">search_insights</span>
+<span class="font-label-mono text-label-mono">Research</span>
+</a>
+<a class="flex items-center gap-sm px-sm py-xs text-on-surface-variant hover:bg-white/5 rounded-lg transition-colors group" href="#">
+<span class="material-symbols-outlined text-[20px] group-hover:text-primary transition-colors">payments</span>
+<span class="font-label-mono text-label-mono">Financials</span>
+</a>
+<a class="flex items-center gap-sm px-sm py-xs text-on-surface-variant hover:bg-white/5 rounded-lg transition-colors group" href="#">
+<span class="material-symbols-outlined text-[20px] group-hover:text-primary transition-colors">analytics</span>
+<span class="font-label-mono text-label-mono">Sentiment</span>
+</a>
+<a class="flex items-center gap-sm px-sm py-xs text-on-surface-variant hover:bg-white/5 rounded-lg transition-colors group" href="#">
+<span class="material-symbols-outlined text-[20px] group-hover:text-primary transition-colors">warning</span>
+<span class="font-label-mono text-label-mono">Risk</span>
+</a>
+<!-- Active Navigation Logic: "Verdict" is the current screen intent -->
+<a class="flex items-center gap-sm px-sm py-xs text-primary font-bold bg-white/5 rounded-lg transition-all active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">gavel</span>
+<span class="font-label-mono text-label-mono">Verdict</span>
+</a>
+</nav>
+<div class="mt-auto flex flex-col gap-1 pt-sm border-t border-white/5">
+<a class="flex items-center gap-sm px-sm py-xs text-on-surface-variant hover:bg-white/5 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">help</span>
+<span class="font-label-mono text-label-mono">Help</span>
+</a>
+<a class="flex items-center gap-sm px-sm py-xs text-on-surface-variant hover:bg-white/5 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">history</span>
+<span class="font-label-mono text-label-mono">Archive</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="ml-64 min-h-screen">
+<!-- Top Utility Bar (Based on TopNavBar JSON) -->
+<header class="h-16 flex justify-between items-center px-gutter border-b border-white/5 bg-surface/80 backdrop-blur-md sticky top-0 z-40">
+<div class="flex items-center gap-md">
+<span class="font-headline-md text-headline-sm font-bold text-primary">NVIDIA (NVDA)</span>
+<div class="flex items-center gap-xs">
+<span class="status-pill px-2 py-0.5 rounded text-[10px] font-label-mono">NASDAQ</span>
+<span class="text-on-surface-variant font-label-mono text-[10px]">$822.79 (+1.2%)</span>
+</div>
+</div>
+<div class="flex items-center gap-md">
+<div class="flex gap-sm border-r border-white/10 pr-md">
+<button class="text-primary hover:opacity-80 transition-opacity font-body-md text-body-md">Export</button>
+<button class="text-on-surface-variant hover:opacity-80 transition-opacity font-body-md text-body-md">Compare</button>
+</div>
+<div class="flex gap-sm">
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:text-primary transition-colors">notifications</span>
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:text-primary transition-colors">settings</span>
+</div>
+</div>
+</header>
+<div class="max-w-7xl mx-auto px-gutter py-xl">
+<!-- Hero Section -->
+<section class="flex flex-col md:flex-row justify-between items-start md:items-end gap-lg mb-xl">
+<div class="flex-1 space-y-md">
+<div class="flex items-center gap-sm">
+<span class="px-md py-xs bg-secondary/10 border border-secondary/20 text-secondary rounded-full font-label-mono text-xs tracking-widest uppercase">Investment Decision</span>
+<span class="text-on-surface-variant font-label-mono text-xs">• Final Analysis Released Oct 24, 2023</span>
+</div>
+<h2 class="font-display-lg text-display-lg text-primary max-w-2xl">Definitive Investment Verdict: NVIDIA Corp.</h2>
+</div>
+<div class="glass-card p-xl rounded-xl flex flex-col items-center justify-center min-w-[280px] text-center relative overflow-hidden group">
+<div class="absolute inset-0 bg-secondary/5 group-hover:bg-secondary/10 transition-colors"></div>
+<span class="font-label-mono text-on-surface-variant text-xs mb-sm uppercase tracking-widest z-10">Confidence Score</span>
+<div class="font-display-lg text-6xl font-bold text-secondary mb-md z-10">84<span class="text-2xl">%</span></div>
+<div class="bg-secondary text-on-secondary px-lg py-sm rounded font-bold uppercase tracking-widest text-lg z-10">INVEST</div>
+</div>
+</section>
+<!-- Thesis Bento Grid -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-md mb-xl">
+<!-- Investment Thesis -->
+<div class="md:col-span-12 glass-card p-lg rounded-xl">
+<h3 class="font-headline-sm text-headline-sm text-primary mb-md border-l-4 border-secondary pl-sm">Investment Thesis</h3>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-lg">
+<div class="space-y-sm">
+<h4 class="font-label-mono text-secondary text-xs uppercase">01. GPU Dominance</h4>
+<p class="text-on-surface-variant leading-relaxed">Persistent architecture advantage via H100/H200 and Blackwell transition creates a multi-year lead in AI compute density that competitors (AMD/Intel) are currently failing to disrupt.</p>
+</div>
+<div class="space-y-sm">
+<h4 class="font-label-mono text-secondary text-xs uppercase">02. Software Ecosystem</h4>
+<p class="text-on-surface-variant leading-relaxed">The CUDA moat is expanding beyond traditional ML into enterprise-grade digital twins and omniverse simulations, locking in sovereign cloud deployments globally.</p>
+</div>
+<div class="space-y-sm">
+<h4 class="font-label-mono text-secondary text-xs uppercase">03. Margin Expansion</h4>
+<p class="text-on-surface-variant leading-relaxed">Unique pricing power in the data center segment is driving unprecedented gross margins (76%+), providing massive cash flow for R&amp;D and capital return programs.</p>
+</div>
+</div>
+</div>
+<!-- Financial Summary -->
+<div class="md:col-span-5 glass-card p-lg rounded-xl overflow-hidden relative">
+<div class="absolute top-0 right-0 w-32 h-32 bg-primary/5 blur-3xl rounded-full -mr-16 -mt-16"></div>
+<h3 class="font-label-mono text-on-surface-variant text-xs uppercase mb-lg">Financial Summary</h3>
+<div class="space-y-md">
+<div class="flex justify-between items-center border-b border-white/5 pb-sm">
+<span class="text-on-surface-variant">Revenue Growth (YoY)</span>
+<span class="font-label-mono text-secondary">+262%</span>
+</div>
+<div class="flex justify-between items-center border-b border-white/5 pb-sm">
+<span class="text-on-surface-variant">Gross Margin</span>
+<span class="font-label-mono">78.4%</span>
+</div>
+<div class="flex justify-between items-center border-b border-white/5 pb-sm">
+<span class="text-on-surface-variant">P/E Ratio (FWD)</span>
+<span class="font-label-mono">34.2x</span>
+</div>
+<div class="flex justify-between items-center border-b border-white/5 pb-sm">
+<span class="text-on-surface-variant">Free Cash Flow</span>
+<span class="font-label-mono text-secondary">$14.9B</span>
+</div>
+<div class="mt-lg pt-sm">
+<div class="flex justify-between text-[10px] text-on-surface-variant font-label-mono mb-2">
+<span>MARKET SHARE</span>
+<span>92%</span>
+</div>
+<div class="w-full bg-white/5 h-1.5 rounded-full overflow-hidden">
+<div class="bg-secondary h-full" style="width: 92%;"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Sentiment Analysis -->
+<div class="md:col-span-7 glass-card p-lg rounded-xl">
+<h3 class="font-label-mono text-on-surface-variant text-xs uppercase mb-lg">Earnings Sentiment (Q3)</h3>
+<div class="flex h-48 gap-4 items-end px-md">
+<div class="flex-1 bg-secondary/20 h-[80%] rounded-t-sm relative group">
+<div class="absolute -top-6 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity font-label-mono text-[10px]">Bullish</div>
+</div>
+<div class="flex-1 bg-secondary/10 h-[65%] rounded-t-sm"></div>
+<div class="flex-1 bg-secondary/30 h-[95%] rounded-t-sm"></div>
+<div class="flex-1 bg-white/10 h-[40%] rounded-t-sm"></div>
+<div class="flex-1 bg-white/5 h-[20%] rounded-t-sm"></div>
+<div class="flex-1 bg-error/20 h-[15%] rounded-t-sm"></div>
+</div>
+<div class="mt-lg grid grid-cols-2 gap-md">
+<div class="flex items-start gap-sm">
+<span class="material-symbols-outlined text-secondary text-sm">trending_up</span>
+<p class="text-[12px] text-on-surface-variant leading-tight">Analyst consensus focuses on sustained demand beyond the current hype cycle.</p>
+</div>
+<div class="flex items-start gap-sm">
+<span class="material-symbols-outlined text-error text-sm">trending_down</span>
+<p class="text-[12px] text-on-surface-variant leading-tight">Management cautious about supply chain bottlenecks in H2 2024.</p>
+</div>
+</div>
+</div>
+<!-- Risk Matrix -->
+<div class="md:col-span-6 glass-card p-lg rounded-xl">
+<h3 class="font-label-mono text-on-surface-variant text-xs uppercase mb-lg">Risk Matrix (2x2)</h3>
+<div class="grid grid-cols-2 gap-1 bg-white/5 p-1 rounded-lg">
+<div class="bg-surface p-md min-h-[100px] flex flex-col justify-center">
+<span class="text-[10px] font-label-mono text-error/60 mb-2 uppercase">Critical/Internal</span>
+<p class="text-xs text-on-surface">Execution lag on Blackwell Blackwell roadmap</p>
+</div>
+<div class="bg-surface p-md min-h-[100px] flex flex-col justify-center border-l border-white/5">
+<span class="text-[10px] font-label-mono text-on-surface-variant mb-2 uppercase">Critical/External</span>
+<p class="text-xs text-on-surface">Geopolitical export restrictions (CN)</p>
+</div>
+<div class="bg-surface p-md min-h-[100px] flex flex-col justify-center border-t border-white/5">
+<span class="text-[10px] font-label-mono text-on-surface-variant mb-2 uppercase">Low Impact/Internal</span>
+<p class="text-xs text-on-surface">Gaming division growth stagnation</p>
+</div>
+<div class="bg-surface p-md min-h-[100px] flex flex-col justify-center border-l border-t border-white/5">
+<span class="text-[10px] font-label-mono text-on-surface-variant mb-2 uppercase">Low Impact/External</span>
+<p class="text-xs text-on-surface">Rising energy costs for AI data centers</p>
+</div>
+</div>
+</div>
+<!-- The Bear Case -->
+<div class="md:col-span-6 glass-card p-lg rounded-xl border-l-4 border-error/50">
+<h3 class="font-label-mono text-error text-xs uppercase mb-lg flex items-center gap-xs">
+<span class="material-symbols-outlined text-sm">psychiatry</span>
+                        The Bear Case
+                    </h3>
+<p class="text-on-surface-variant leading-relaxed mb-md italic">
+                        "The primary risk is a potential 'AI Winter' where enterprise ROI on generative AI fails to materialize fast enough to justify sustained infrastructure CapEx."
+                    </p>
+<ul class="space-y-sm text-xs text-on-surface-variant">
+<li class="flex items-center gap-sm">
+<span class="w-1.5 h-1.5 bg-error/40 rounded-full"></span>
+                            Hyperscalers (MSFT, GOOG) developing in-house silicon.
+                        </li>
+<li class="flex items-center gap-sm">
+<span class="w-1.5 h-1.5 bg-error/40 rounded-full"></span>
+                            Valuation multiples are at historical 5-year ceilings.
+                        </li>
+</ul>
+</div>
+</div>
+<!-- Explainability Panel -->
+<section class="glass-card p-lg rounded-xl mb-xl">
+<div class="flex items-center justify-between mb-lg">
+<h3 class="font-headline-sm text-headline-sm text-primary">Explainability Panel</h3>
+<div class="flex items-center gap-xs text-on-surface-variant text-[10px] font-label-mono">
+<span class="w-2 h-2 bg-secondary rounded-full animate-pulse"></span>
+                        LIVE DATA SOURCES
+                    </div>
+</div>
+<div class="space-y-md">
+<p class="text-on-surface-variant max-w-3xl">This decision was synthesized from 1,240 individual data points across the following high-integrity sources. AI confidence is derived from the cross-referencing of management commentary against hard financial filings.</p>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-sm">
+<div class="flex items-center justify-between p-sm bg-white/5 rounded-lg border border-white/5 hover:border-white/20 transition-all cursor-pointer group">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary">description</span>
+<div>
+<p class="text-sm font-medium">SEC Form 10-K (2024)</p>
+<p class="text-[10px] text-on-surface-variant">Validated structural risk &amp; debt profiles</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-sm opacity-0 group-hover:opacity-100 transition-opacity">open_in_new</span>
+</div>
+<div class="flex items-center justify-between p-sm bg-white/5 rounded-lg border border-white/5 hover:border-white/20 transition-all cursor-pointer group">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary">forum</span>
+<div>
+<p class="text-sm font-medium">Q3 Earnings Call Transcript</p>
+<p class="text-[10px] text-on-surface-variant">Sentiment mapped: 42 bullish, 3 neutral</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-sm opacity-0 group-hover:opacity-100 transition-opacity">open_in_new</span>
+</div>
+<div class="flex items-center justify-between p-sm bg-white/5 rounded-lg border border-white/5 hover:border-white/20 transition-all cursor-pointer group">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary">analytics</span>
+<div>
+<p class="text-sm font-medium">Global Semiconductor Index (SOXX)</p>
+<p class="text-[10px] text-on-surface-variant">Relative performance benchmarking</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-sm opacity-0 group-hover:opacity-100 transition-opacity">open_in_new</span>
+</div>
+<div class="flex items-center justify-between p-sm bg-white/5 rounded-lg border border-white/5 hover:border-white/20 transition-all cursor-pointer group">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary">language</span>
+<div>
+<p class="text-sm font-medium">Bloomberg Supply Chain Data</p>
+<p class="text-[10px] text-on-surface-variant">Real-time inventory levels analysis</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-sm opacity-0 group-hover:opacity-100 transition-opacity">open_in_new</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Bottom CTA Area -->
+<footer class="flex flex-col md:flex-row justify-between items-center py-lg border-t border-white/5 gap-md">
+<div class="flex items-center gap-md">
+<div class="flex -space-x-2">
+<div class="w-8 h-8 rounded-full border-2 border-background bg-surface-bright flex items-center justify-center text-[10px] font-bold">JD</div>
+<div class="w-8 h-8 rounded-full border-2 border-background bg-surface-bright flex items-center justify-center text-[10px] font-bold">AL</div>
+<div class="w-8 h-8 rounded-full border-2 border-background bg-surface-bright flex items-center justify-center text-[10px] font-bold">MK</div>
+</div>
+<span class="text-xs text-on-surface-variant">3 senior analysts have reviewed this AI verdict.</span>
+</div>
+<div class="flex gap-md">
+<button class="px-xl py-md bg-white text-black font-bold rounded hover:bg-opacity-90 active:scale-95 transition-all flex items-center gap-sm">
+<span class="material-symbols-outlined text-[20px]">download</span>
+                        Export Report (PDF)
+                    </button>
+<button class="px-xl py-md border border-white/20 text-primary font-bold rounded hover:bg-white/5 active:scale-95 transition-all">
+                        Archive Decision
+                    </button>
+</div>
+</footer>
+</div>
+</main>
+<!-- Interactive micro-interactions script -->
+<script>
+        document.querySelectorAll('.glass-card').forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                card.style.setProperty('--mouse-x', `${x}px`);
+                card.style.setProperty('--mouse-y', `${y}px`);
+            });
+        });
+    </script>
+</body></html>

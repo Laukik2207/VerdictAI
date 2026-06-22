@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>VerdictAI — Report Export</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        /* Custom scrollbar for the document preview area */
+        .preview-scroll::-webkit-scrollbar {
+            width: 6px;
+        }
+        .preview-scroll::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.02);
+        }
+        .preview-scroll::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+        /* Paper effect for the document */
+        .paper-canvas {
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05);
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-lowest": "#0e0e0e",
+                        "surface-bright": "#3a3939",
+                        "surface": "#131313",
+                        "on-primary-fixed": "#1a1c1c",
+                        "on-surface": "#e5e2e1",
+                        "on-tertiary-fixed-variant": "#004395",
+                        "surface-variant": "#353534",
+                        "on-tertiary": "#002e6a",
+                        "background": "#131313",
+                        "outline-variant": "#444748",
+                        "inverse-on-surface": "#313030",
+                        "error": "#ffb4ab",
+                        "secondary-fixed": "#6ffbbe",
+                        "tertiary-fixed-dim": "#adc6ff",
+                        "secondary": "#4edea3",
+                        "on-surface-variant": "#c4c7c8",
+                        "on-tertiary-container": "#0060ce",
+                        "surface-container": "#201f1f",
+                        "tertiary-container": "#d8e2ff",
+                        "error-container": "#93000a",
+                        "on-primary-container": "#636565",
+                        "on-secondary-fixed": "#002113",
+                        "primary-fixed": "#e2e2e2",
+                        "primary-container": "#e2e2e2",
+                        "inverse-surface": "#e5e2e1",
+                        "surface-container-highest": "#353534",
+                        "primary": "#ffffff",
+                        "surface-container-low": "#1c1b1b",
+                        "on-background": "#e5e2e1",
+                        "inverse-primary": "#5d5f5f",
+                        "surface-tint": "#c6c6c7",
+                        "tertiary": "#ffffff",
+                        "primary-fixed-dim": "#c6c6c7",
+                        "on-error-container": "#ffdad6",
+                        "on-secondary-container": "#00311f",
+                        "on-tertiary-fixed": "#001a42",
+                        "on-secondary-fixed-variant": "#005236",
+                        "secondary-container": "#00a572",
+                        "secondary-fixed-dim": "#4edea3",
+                        "on-error": "#690005",
+                        "on-primary-fixed-variant": "#454747",
+                        "outline": "#8e9192",
+                        "on-secondary": "#003824",
+                        "surface-container-high": "#2a2a2a",
+                        "on-primary": "#2f3131",
+                        "surface-dim": "#131313",
+                        "tertiary-fixed": "#d8e2ff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "base": "4px",
+                        "gutter": "24px",
+                        "margin-safe": "32px",
+                        "md": "24px",
+                        "xs": "8px",
+                        "sm": "16px",
+                        "lg": "40px",
+                        "xl": "64px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "headline-md-mobile": ["Inter"],
+                        "label-mono": ["JetBrains Mono"],
+                        "headline-sm": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "body-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-md": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                        "headline-md-mobile": ["20px", {"lineHeight": "1.2", "fontWeight": "600"}],
+                        "label-mono": ["12px", {"lineHeight": "1.0", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                        "headline-sm": ["18px", {"lineHeight": "1.4", "fontWeight": "500"}],
+                        "headline-md": ["24px", {"lineHeight": "1.3", "letterSpacing": "-0.01em", "fontWeight": "500"}],
+                        "body-lg": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-background text-on-surface font-body-md selection:bg-primary selection:text-on-primary overflow-hidden">
+<!-- TopNavBar -->
+<nav class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-gutter h-16 bg-surface border-b border-white/10">
+<div class="flex items-center gap-md">
+<span class="text-headline-md font-headline-md font-bold text-primary">VerdictAI</span>
+<div class="hidden md:flex items-center gap-sm ml-lg">
+<a class="text-on-surface-variant font-body-md hover:opacity-80 transition-opacity" href="#">Research</a>
+<a class="text-on-surface-variant font-body-md hover:opacity-80 transition-opacity" href="#">History</a>
+<a class="text-on-surface-variant font-body-md hover:opacity-80 transition-opacity" href="#">Thesis</a>
+<a class="text-primary border-b-2 border-primary pb-1 font-body-md hover:opacity-80 transition-opacity" href="#">Reports</a>
+</div>
+</div>
+<div class="flex items-center gap-sm">
+<button class="px-sm py-xs bg-surface border border-white/10 text-primary rounded hover:opacity-80 transition-opacity active:scale-95 duration-200">Compare</button>
+<button class="px-sm py-xs bg-primary text-on-primary rounded font-bold hover:opacity-80 transition-opacity active:scale-95 duration-200">Export</button>
+<div class="h-6 w-px bg-white/10 mx-xs"></div>
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:opacity-80 transition-opacity">notifications</span>
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:opacity-80 transition-opacity">settings</span>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-white/10 ml-xs">
+<img class="w-full h-full object-cover" data-alt="Professional user profile picture of a financial analyst, close-up headshot with soft lighting and a minimalist dark background, high-end institutional style consistent with VerdictAI aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDoBZx5amVm4-5UeQNxgHZsH63GzYTSy-mZOMIA8Yhmd-8R09xE6p1bPE8LKGhpW2ZgAEtwNj_7uY9KwF787zXcYBzHe_tciFLU1N454Af50SQxs21YcoKZAcWih1rmsSTqgzzdBIsV5uq7Xa-Tzm0gexR_I7SDQE8T-u4IHzifIL7yKmuMhd1cBII9Pyks3fopiH3YUqKilym_b3FQHRJdsI25fzhF1P7-EoJAKHicyuGL1-XubJGPRyobeNmS1rqUjTrYZ76XpNc"/>
+</div>
+</div>
+</nav>
+<!-- SideNavBar (Left) -->
+<aside class="fixed left-0 top-16 h-[calc(100vh-64px)] w-64 flex flex-col p-sm bg-surface-container-low border-r border-white/5 z-40">
+<div class="flex flex-col gap-xs mb-lg">
+<div class="flex items-center gap-sm px-xs py-sm mb-xs">
+<div class="w-10 h-10 bg-primary flex items-center justify-center rounded-lg">
+<span class="material-symbols-outlined text-on-primary" style="font-variation-settings: 'FILL' 1;">gavel</span>
+</div>
+<div>
+<div class="font-headline-sm text-headline-sm font-semibold text-primary">VerdictAI</div>
+<div class="font-label-mono text-label-mono text-on-surface-variant opacity-60">Institutional Research</div>
+</div>
+</div>
+<button class="w-full flex items-center justify-center gap-xs py-sm bg-primary text-on-primary rounded-lg font-bold transition-all active:scale-[0.98]">
+<span class="material-symbols-outlined text-sm">add</span>
+                New Analysis
+            </button>
+</div>
+<nav class="flex-1 flex flex-col gap-1 overflow-y-auto">
+<a class="flex items-center gap-sm px-sm py-sm text-on-surface-variant font-label-mono hover:bg-white/5 transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined">search_insights</span> Research
+            </a>
+<a class="flex items-center gap-sm px-sm py-sm text-on-surface-variant font-label-mono hover:bg-white/5 transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined">payments</span> Financials
+            </a>
+<a class="flex items-center gap-sm px-sm py-sm text-on-surface-variant font-label-mono hover:bg-white/5 transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined">analytics</span> Sentiment
+            </a>
+<a class="flex items-center gap-sm px-sm py-sm text-on-surface-variant font-label-mono hover:bg-white/5 transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined">warning</span> Risk
+            </a>
+<a class="flex items-center gap-sm px-sm py-sm text-primary font-bold bg-white/5 rounded-lg font-label-mono" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">gavel</span> Verdict
+            </a>
+</nav>
+<div class="pt-sm border-t border-white/5 flex flex-col gap-1 mt-auto">
+<a class="flex items-center gap-sm px-sm py-sm text-on-surface-variant font-label-mono hover:bg-white/5 transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined">help</span> Help
+            </a>
+<a class="flex items-center gap-sm px-sm py-sm text-on-surface-variant font-label-mono hover:bg-white/5 transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined">history</span> Archive
+            </a>
+</div>
+</aside>
+<!-- Main Workspace -->
+<main class="ml-64 mt-16 h-[calc(100vh-64px)] flex overflow-hidden relative">
+<!-- Floating Action Overlay for Document -->
+<div class="absolute top-sm right-sm flex flex-col gap-sm z-30">
+<button class="flex items-center gap-xs px-sm py-sm bg-primary text-on-primary rounded-lg font-bold shadow-xl active:scale-95 transition-all">
+<span class="material-symbols-outlined">download</span> Download PDF
+            </button>
+<button class="flex items-center gap-xs px-sm py-sm bg-surface-container-high border border-white/10 text-primary rounded-lg font-bold shadow-xl active:scale-95 transition-all">
+<span class="material-symbols-outlined">link</span> Share Link
+            </button>
+<button class="flex items-center gap-xs px-sm py-sm bg-surface-container-high border border-white/10 text-primary rounded-lg font-bold shadow-xl active:scale-95 transition-all">
+<span class="material-symbols-outlined">mail</span> Send to Email
+            </button>
+</div>
+<!-- Document Preview Canvas -->
+<div class="flex-1 bg-surface-container-lowest p-xl overflow-y-auto preview-scroll flex justify-center">
+<div class="w-full max-w-[850px] paper-canvas bg-white text-[#1a1c1c] min-h-[1200px] flex flex-col px-16 py-20 relative animate-in fade-in duration-700">
+<!-- PDF Header Decoration -->
+<div class="absolute top-0 left-0 w-full h-1 bg-primary"></div>
+<!-- Report Header -->
+<header class="flex justify-between items-start mb-16">
+<div>
+<div class="text-[32px] font-bold tracking-tight leading-none mb-2">VerdictAI Institutional Report</div>
+<div class="font-label-mono text-xs uppercase tracking-widest text-[#666] mb-8">Ref: VA-2024-X092-ALPHA</div>
+<div class="space-y-1">
+<p class="text-sm font-semibold">Subject: NVIDIA Corp (NVDA)</p>
+<p class="text-xs text-[#888]">Generated on: Oct 24, 2024 • Analysts: AI Collective 7</p>
+</div>
+</div>
+<div class="text-right">
+<div class="w-16 h-16 border-2 border-black flex items-center justify-center font-bold text-xl mb-2">V/AI</div>
+<div class="text-[10px] font-label-mono text-[#aaa]">INTERNAL USE ONLY</div>
+</div>
+</header>
+<!-- Executive Summary -->
+<section class="mb-12">
+<h2 class="text-lg font-bold border-b border-black/10 pb-2 mb-4">Executive Summary</h2>
+<p class="text-sm leading-relaxed mb-4 text-[#333]">
+                        This comprehensive analysis evaluates the strategic positioning of NVIDIA Corp within the current macroeconomic cycle and competitive landscape of generative AI infrastructure. Our models indicate a persistent dominance in high-bandwidth memory (HBM) integration and specialized tensor core architectures. While market volatility remains elevated, the underlying demand signal from hyperscalers provides a robust floor for valuation through FY25.
+                    </p>
+<div class="grid grid-cols-3 gap-8 py-4 px-6 bg-gray-50 border border-gray-100 rounded-lg">
+<div>
+<div class="text-[10px] font-label-mono text-[#888] uppercase mb-1">Target Price</div>
+<div class="text-lg font-bold">$1,250.00</div>
+</div>
+<div>
+<div class="text-[10px] font-label-mono text-[#888] uppercase mb-1">Conviction Level</div>
+<div class="text-lg font-bold text-secondary-container">High (92%)</div>
+</div>
+<div>
+<div class="text-[10px] font-label-mono text-[#888] uppercase mb-1">Horizon</div>
+<div class="text-lg font-bold">12-18 Months</div>
+</div>
+</div>
+</section>
+<!-- Committee Verdict -->
+<section class="mb-12">
+<h2 class="text-lg font-bold border-b border-black/10 pb-2 mb-4">Committee Verdict</h2>
+<div class="flex items-center gap-8 bg-[#1a1c1c] text-white p-8 rounded-lg">
+<div class="flex-1">
+<div class="text-[10px] font-label-mono text-gray-400 uppercase tracking-widest mb-2">Final Recommendation</div>
+<div class="text-4xl font-extrabold tracking-tighter">INVEST</div>
+</div>
+<div class="w-px h-16 bg-white/20"></div>
+<div class="flex-1">
+<p class="text-xs text-gray-400 leading-normal italic">
+                                "The convergence of Blackwell supply ramp-up and software-defined moat (CUDA) justifies a tactical overweight position despite premium multiples."
+                            </p>
+</div>
+</div>
+</section>
+<!-- Detailed Evidence -->
+<section class="mb-12">
+<h2 class="text-lg font-bold border-b border-black/10 pb-2 mb-4">Detailed Evidence</h2>
+<div class="space-y-8">
+<div class="relative pl-6 border-l-2 border-gray-200">
+<div class="font-bold text-sm mb-1">Agent Output: Supply Chain Intelligence</div>
+<p class="text-xs leading-relaxed text-[#444]">
+                                Channel checks in TSMC CoWoS packaging facilities indicate a 30% yield improvement in Blackwell components. Logistics lead times have compressed from 24 weeks to 18 weeks, suggesting supply chain elasticity.
+                            </p>
+</div>
+<div class="relative pl-6 border-l-2 border-gray-200">
+<div class="font-bold text-sm mb-1">Agent Output: Competitive Landscape</div>
+<p class="text-xs leading-relaxed text-[#444]">
+                                Competitive pressure from custom ASIC development (Google TPUs, AWS Trainium) is offset by the 'Developer Stickiness' factor of CUDA. Legacy enterprise migration remains focused on 'off-the-shelf' NVIDIA solutions.
+                            </p>
+</div>
+</div>
+</section>
+<!-- Risk Disclosure -->
+<section class="mb-12">
+<div class="p-6 border-2 border-red-50 bg-red-50/20 rounded-lg">
+<h2 class="text-lg font-bold text-red-900 mb-2">Risk Disclosure</h2>
+<ul class="list-disc list-inside space-y-2 text-xs text-red-950 leading-relaxed">
+<li>Concentration Risk: Top 4 customers account for ~45% of total revenue.</li>
+<li>Geopolitical Friction: Stricter export controls on H20/L20 chips could impact APAC segment by 12-15%.</li>
+<li>Cycle Fatigue: Potential 'digestion period' by CSPs leading to capital expenditure cooling.</li>
+</ul>
+</div>
+</section>
+<!-- Appendix -->
+<section class="mt-auto pt-12 border-t-2 border-dashed border-gray-100">
+<h2 class="text-xs font-bold text-[#888] uppercase tracking-widest mb-4">Appendix: Source List</h2>
+<div class="grid grid-cols-2 gap-x-12 gap-y-2 text-[10px] text-[#aaa]">
+<div class="flex justify-between border-b border-gray-50 pb-1">
+<span>SEC Form 10-K (2023)</span>
+<span class="font-label-mono">Verified</span>
+</div>
+<div class="flex justify-between border-b border-gray-50 pb-1">
+<span>Supply Chain Digest (Oct '24)</span>
+<span class="font-label-mono">Tertiary</span>
+</div>
+<div class="flex justify-between border-b border-gray-50 pb-1">
+<span>Gartner AI Infrastructure Report</span>
+<span class="font-label-mono">Verified</span>
+</div>
+<div class="flex justify-between border-b border-gray-50 pb-1">
+<span>Earnings Call Transcript (Q3)</span>
+<span class="font-label-mono">Primary</span>
+</div>
+</div>
+<footer class="mt-12 flex justify-between items-end">
+<div class="text-[9px] text-[#ccc]">
+                            Copyright © 2024 VerdictAI Research Partners. All rights reserved. <br/>
+                            This document contains proprietary information and is intended for institutional clients only.
+                        </div>
+<div class="text-[10px] font-label-mono text-[#888]">Page 1 of 24</div>
+</footer>
+</section>
+</div>
+</div>
+<!-- Document Navigation / Details Right Side (Sticky) -->
+<div class="w-80 h-full bg-surface-container border-l border-white/5 p-gutter hidden xl:flex flex-col gap-lg">
+<div>
+<h3 class="text-label-mono font-label-mono text-on-surface-variant uppercase mb-sm">Document Navigation</h3>
+<div class="space-y-4">
+<div class="group flex items-start gap-sm cursor-pointer">
+<div class="w-1 h-8 bg-primary rounded-full"></div>
+<div>
+<div class="text-sm font-bold text-primary group-hover:underline">Executive Summary</div>
+<div class="text-[10px] text-on-surface-variant">Page 1</div>
+</div>
+</div>
+<div class="group flex items-start gap-sm cursor-pointer opacity-60 hover:opacity-100">
+<div class="w-1 h-8 bg-transparent group-hover:bg-white/20 rounded-full"></div>
+<div>
+<div class="text-sm font-bold text-on-surface">Financial Modeling</div>
+<div class="text-[10px] text-on-surface-variant">Page 4</div>
+</div>
+</div>
+<div class="group flex items-start gap-sm cursor-pointer opacity-60 hover:opacity-100">
+<div class="w-1 h-8 bg-transparent group-hover:bg-white/20 rounded-full"></div>
+<div>
+<div class="text-sm font-bold text-on-surface">Agent Deep-Dive</div>
+<div class="text-[10px] text-on-surface-variant">Page 12</div>
+</div>
+</div>
+<div class="group flex items-start gap-sm cursor-pointer opacity-60 hover:opacity-100">
+<div class="w-1 h-8 bg-transparent group-hover:bg-white/20 rounded-full"></div>
+<div>
+<div class="text-sm font-bold text-on-surface">Full Bibliography</div>
+<div class="text-[10px] text-on-surface-variant">Page 22</div>
+</div>
+</div>
+</div>
+</div>
+<div>
+<h3 class="text-label-mono font-label-mono text-on-surface-variant uppercase mb-sm">Security Policy</h3>
+<div class="p-sm bg-surface-container-highest rounded-lg border border-white/5 space-y-3">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-sm text-secondary">verified_user</span>
+<span class="text-xs">End-to-End Encrypted</span>
+</div>
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-sm text-secondary">visibility_off</span>
+<span class="text-xs">Dynamic Watermark Active</span>
+</div>
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-sm text-secondary">timer</span>
+<span class="text-xs">Link expires in 48h</span>
+</div>
+</div>
+</div>
+<div class="mt-auto">
+<div class="p-md bg-primary text-on-primary rounded-xl text-center">
+<div class="text-xs font-label-mono uppercase mb-1">Export Integrity</div>
+<div class="text-xl font-bold">100% Validated</div>
+<p class="text-[10px] opacity-70 mt-2 leading-tight">All AI outputs cross-referenced with primary SEC filings and verified news sources.</p>
+</div>
+</div>
+</div>
+</main>
+<!-- Bottom Mobile Nav (Fallback) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full bg-surface-container border-t border-white/10 flex justify-around py-xs z-50">
+<button class="flex flex-col items-center gap-1 p-2 text-on-surface-variant">
+<span class="material-symbols-outlined">search_insights</span>
+<span class="text-[10px] font-label-mono">Research</span>
+</button>
+<button class="flex flex-col items-center gap-1 p-2 text-on-surface-variant">
+<span class="material-symbols-outlined">analytics</span>
+<span class="text-[10px] font-label-mono">Data</span>
+</button>
+<button class="flex flex-col items-center gap-1 p-2 text-primary font-bold">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">description</span>
+<span class="text-[10px] font-label-mono">Reports</span>
+</button>
+<button class="flex flex-col items-center gap-1 p-2 text-on-surface-variant">
+<span class="material-symbols-outlined">account_circle</span>
+<span class="text-[10px] font-label-mono">Profile</span>
+</button>
+</nav>
+<script>
+        // Micro-interaction for primary button
+        document.querySelectorAll('button').forEach(btn => {
+            btn.addEventListener('mousedown', () => {
+                btn.classList.add('scale-95');
+            });
+            btn.addEventListener('mouseup', () => {
+                btn.classList.remove('scale-95');
+            });
+            btn.addEventListener('mouseleave', () => {
+                btn.classList.remove('scale-95');
+            });
+        });
+
+        // Simple scroll reveal simulation
+        const scrollArea = document.querySelector('.preview-scroll');
+        const documentPaper = document.querySelector('.paper-canvas');
+        
+        scrollArea.addEventListener('scroll', () => {
+            const scrolled = scrollArea.scrollTop;
+            // Subtle parallax or scale effects could go here
+        });
+    </script>
+</body></html>

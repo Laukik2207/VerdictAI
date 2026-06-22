@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>VerdictAI | AI Investment Decisions, Explained</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-lowest": "#0e0e0e",
+                        "surface-bright": "#3a3939",
+                        "surface": "#131313",
+                        "on-primary-fixed": "#1a1c1c",
+                        "on-surface": "#e5e2e1",
+                        "on-tertiary-fixed-variant": "#004395",
+                        "surface-variant": "#353534",
+                        "on-tertiary": "#002e6a",
+                        "background": "#131313",
+                        "outline-variant": "#444748",
+                        "inverse-on-surface": "#313030",
+                        "error": "#ffb4ab",
+                        "secondary-fixed": "#6ffbbe",
+                        "tertiary-fixed-dim": "#adc6ff",
+                        "secondary": "#4edea3",
+                        "on-surface-variant": "#c4c7c8",
+                        "on-tertiary-container": "#0060ce",
+                        "surface-container": "#201f1f",
+                        "tertiary-container": "#d8e2ff",
+                        "error-container": "#93000a",
+                        "on-primary-container": "#636565",
+                        "on-secondary-fixed": "#002113",
+                        "primary-fixed": "#e2e2e2",
+                        "primary-container": "#e2e2e2",
+                        "inverse-surface": "#e5e2e1",
+                        "surface-container-highest": "#353534",
+                        "primary": "#ffffff",
+                        "surface-container-low": "#1c1b1b",
+                        "on-background": "#e5e2e1",
+                        "inverse-primary": "#5d5f5f",
+                        "surface-tint": "#c6c6c7",
+                        "tertiary": "#ffffff",
+                        "primary-fixed-dim": "#c6c6c7",
+                        "on-error-container": "#ffdad6",
+                        "on-secondary-container": "#00311f",
+                        "on-tertiary-fixed": "#001a42",
+                        "on-secondary-fixed-variant": "#005236",
+                        "secondary-container": "#00a572",
+                        "secondary-fixed-dim": "#4edea3",
+                        "on-error": "#690005",
+                        "on-primary-fixed-variant": "#454747",
+                        "outline": "#8e9192",
+                        "on-secondary": "#003824",
+                        "surface-container-high": "#2a2a2a",
+                        "on-primary": "#2f3131",
+                        "surface-dim": "#131313",
+                        "tertiary-fixed": "#d8e2ff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "base": "4px",
+                        "gutter": "24px",
+                        "margin-safe": "32px",
+                        "md": "24px",
+                        "xs": "8px",
+                        "sm": "16px",
+                        "lg": "40px",
+                        "xl": "64px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "headline-md-mobile": ["Inter"],
+                        "label-mono": ["JetBrains Mono"],
+                        "headline-sm": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "body-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-md": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                        "headline-md-mobile": ["20px", {"lineHeight": "1.2", "fontWeight": "600"}],
+                        "label-mono": ["12px", {"lineHeight": "1.0", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                        "headline-sm": ["18px", {"lineHeight": "1.4", "fontWeight": "500"}],
+                        "headline-md": ["24px", {"lineHeight": "1.3", "letterSpacing": "-0.01em", "fontWeight": "500"}],
+                        "body-lg": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            background-color: #131313;
+            color: #e5e2e1;
+            font-family: 'Inter', sans-serif;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-top: 1px solid rgba(255, 255, 255, 0.15);
+        }
+        .node-pulse {
+            animation: pulse-glow 3s infinite ease-in-out;
+        }
+        @keyframes pulse-glow {
+            0%, 100% { opacity: 0.5; filter: blur(8px); }
+            50% { opacity: 1; filter: blur(12px); }
+        }
+        .line-flow {
+            stroke-dasharray: 10;
+            animation: dash 20s linear infinite;
+        }
+        @keyframes dash {
+            to { stroke-dashoffset: -1000; }
+        }
+    </style>
+</head>
+<body class="overflow-x-hidden">
+<!-- TopAppBar from JSON -->
+<header class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-gutter h-16 bg-surface border-b border-white/10">
+<div class="flex items-center gap-xl">
+<span class="text-headline-md font-headline-md font-bold text-primary dark:text-primary tracking-tight">VerdictAI</span>
+<nav class="hidden md:flex items-center gap-sm">
+<a class="font-body-md text-body-md text-primary border-b-2 border-primary pb-1 hover:opacity-80 transition-opacity" href="#">Research</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:opacity-80 transition-opacity" href="#">History</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:opacity-80 transition-opacity" href="#">Thesis</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:opacity-80 transition-opacity" href="#">Reports</a>
+</nav>
+</div>
+<div class="flex items-center gap-sm">
+<div class="hidden sm:flex items-center gap-xs mr-md">
+<button class="px-sm py-xs text-primary border border-white/10 rounded font-body-md hover:bg-white/5 transition-all">Compare</button>
+<button class="px-sm py-xs bg-primary text-on-primary rounded font-body-md font-bold hover:scale-95 transition-transform duration-200">Export</button>
+</div>
+<div class="flex items-center gap-xs">
+<button class="p-xs text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="p-xs text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<div class="w-8 h-8 rounded-full bg-surface-container-highest overflow-hidden ml-xs">
+<img class="w-full h-full object-cover" data-alt="A clean, professional headshot of a financial analyst in their 30s with short dark hair, wearing a dark navy blazer over a white shirt. The background is a blurred high-end office environment with soft bokeh lighting and a graphite color palette. The image has a sharp, commercial photography aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuChpnZySN0HsER_1VWctjObJVnTAfZxBvPTKEXCF5XIdzv7BRUoCZz8Ui2A4RbB8UAXyqHRRqtg0PrFU--U4Zuw1fBBbcKHw1-cwqfUWYYTP1zoFudB-FOBdvJJV2TDJ5pDCKa5fIki5Nz2kZAFTIEaVIG675WCYizMtBuP7XzwVUCHMnUhIb5_xQ_zRzqFW5P9sjIcUDpRR8rc5PKrZaYJq_5uxcm1vcSbAmSxQrTPP31zDea0fVe4pCIFOxXzuF30ccr1PEiCTXk"/>
+</div>
+</div>
+</div>
+</header>
+<main class="pt-16">
+<!-- Hero Section -->
+<section class="relative min-h-[819px] flex flex-col items-center justify-center text-center px-gutter py-xl">
+<!-- Background Decoration -->
+<div class="absolute inset-0 -z-10 overflow-hidden">
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-[radial-gradient(circle_at_center,_rgba(255,255,255,0.03)_0%,_transparent_70%)]"></div>
+</div>
+<div class="max-w-4xl mx-auto space-y-md">
+<span class="font-label-mono text-label-mono uppercase tracking-[0.2em] text-on-surface-variant">Institutional Grade Research</span>
+<h1 class="font-display-lg text-display-lg text-primary max-w-2xl mx-auto">AI Investment Decisions, Explained.</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-xl mx-auto">Research any company through a committee of specialized AI analysts. Get institutional-depth reports with fully explainable logic.</p>
+<div class="pt-lg flex flex-col items-center gap-md">
+<div class="w-full max-w-lg glass-card rounded-xl p-xs flex items-center shadow-2xl">
+<span class="material-symbols-outlined ml-sm text-on-surface-variant">search</span>
+<input class="w-full bg-transparent border-none focus:ring-0 text-body-lg px-sm text-primary placeholder:text-on-surface-variant/40" placeholder="Enter Ticker or Company Name..." type="text"/>
+<button class="bg-primary text-on-primary px-lg py-sm rounded-lg font-bold hover:scale-95 transition-all">Start Research</button>
+</div>
+<div class="flex items-center gap-md">
+<button class="font-label-mono text-label-mono flex items-center gap-xs text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[16px]">play_circle</span>
+                            SEE EXAMPLE
+                        </button>
+</div>
+</div>
+</div>
+</section>
+<!-- Animated Workflow Visualization -->
+<section class="px-gutter pb-xl overflow-hidden">
+<div class="max-w-6xl mx-auto glass-card rounded-[2rem] aspect-[21/9] relative overflow-hidden flex items-center justify-center border border-white/5">
+<!-- Background grid -->
+<div class="absolute inset-0 opacity-[0.03]" style="background-image: radial-gradient(circle, #fff 1px, transparent 1px); background-size: 40px 40px;"></div>
+<!-- SVG Visualization -->
+<svg class="w-full h-full absolute inset-0 pointer-events-none" viewbox="0 0 1000 400">
+<!-- Connections -->
+<path class="line-flow" d="M200,100 L500,200" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"></path>
+<path class="line-flow" d="M200,200 L500,200" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"></path>
+<path class="line-flow" d="M200,300 L500,200" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"></path>
+<path class="line-flow" d="M500,200 L800,200" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="2"></path>
+<!-- Nodes -->
+<circle cx="200" cy="100" fill="#ffffff" r="4"></circle>
+<circle cx="200" cy="200" fill="#ffffff" r="4"></circle>
+<circle cx="200" cy="300" fill="#ffffff" r="4"></circle>
+<circle class="node-pulse" cx="500" cy="200" fill="#4edea3" r="8"></circle>
+<circle cx="500" cy="200" fill="#4edea3" r="6"></circle>
+</svg>
+<div class="flex items-center justify-between w-full px-xl relative z-10">
+<!-- Left Column: Input Agents -->
+<div class="space-y-xl">
+<div class="glass-card px-md py-sm rounded-lg flex items-center gap-sm">
+<span class="material-symbols-outlined text-on-surface-variant">payments</span>
+<span class="font-label-mono text-label-mono">FINANCIAL AGENT</span>
+</div>
+<div class="glass-card px-md py-sm rounded-lg flex items-center gap-sm scale-110 shadow-xl border-white/20">
+<span class="material-symbols-outlined text-secondary">analytics</span>
+<span class="font-label-mono text-label-mono">SENTIMENT AGENT</span>
+</div>
+<div class="glass-card px-md py-sm rounded-lg flex items-center gap-sm">
+<span class="material-symbols-outlined text-on-surface-variant">warning</span>
+<span class="font-label-mono text-label-mono">RISK AGENT</span>
+</div>
+</div>
+<!-- Center: Judge -->
+<div class="flex flex-col items-center">
+<div class="w-24 h-24 rounded-full glass-card flex items-center justify-center border-secondary/30 mb-sm">
+<span class="material-symbols-outlined text-secondary text-4xl">gavel</span>
+</div>
+<span class="font-headline-sm text-headline-sm text-primary">Verdict Judge</span>
+<span class="font-label-mono text-label-mono text-secondary">CONSENSUS ACTIVE</span>
+</div>
+<!-- Right: Result -->
+<div class="w-64 glass-card p-md rounded-xl space-y-sm">
+<div class="flex justify-between items-center">
+<span class="font-label-mono text-label-mono">AAPL REPORT</span>
+<span class="font-label-mono text-label-mono text-secondary">VERIFIED</span>
+</div>
+<div class="h-1 bg-white/5 rounded-full overflow-hidden">
+<div class="h-full bg-secondary w-3/4"></div>
+</div>
+<div class="pt-sm space-y-xs">
+<div class="w-full h-2 bg-white/10 rounded"></div>
+<div class="w-5/6 h-2 bg-white/10 rounded"></div>
+<div class="w-4/6 h-2 bg-white/10 rounded"></div>
+</div>
+<button class="w-full py-xs border border-secondary/20 text-secondary font-label-mono text-label-mono rounded hover:bg-secondary/5 transition-colors">VIEW VERDICT</button>
+</div>
+</div>
+</div>
+</section>
+<!-- How It Works -->
+<section class="max-w-6xl mx-auto px-gutter py-xl">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-lg">
+<div class="space-y-sm">
+<div class="w-12 h-12 flex items-center justify-center bg-white/5 rounded-lg border border-white/10">
+<span class="material-symbols-outlined text-primary">edit_square</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-primary">Input</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Provide a ticker or a specific thesis. Our system parses the context and identifies key research areas.</p>
+</div>
+<div class="space-y-sm">
+<div class="w-12 h-12 flex items-center justify-center bg-white/5 rounded-lg border border-white/10">
+<span class="material-symbols-outlined text-primary">science</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-primary">Research</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">A committee of autonomous agents crawls live filings, alternative data, and news to debate the investment.</p>
+</div>
+<div class="space-y-sm">
+<div class="w-12 h-12 flex items-center justify-center bg-white/5 rounded-lg border border-white/10 text-secondary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">gavel</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-primary">Verdict</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Receive a synthesized report with high-confidence signals and fully transparent citation paths.</p>
+</div>
+</div>
+</section>
+<!-- Features Bento Grid -->
+<section class="max-w-6xl mx-auto px-gutter py-xl">
+<h2 class="font-headline-md text-headline-md text-primary mb-lg">Platform Capabilities</h2>
+<div class="grid grid-cols-1 md:grid-cols-12 gap-md">
+<!-- Agent Committee -->
+<div class="md:col-span-8 glass-card p-lg rounded-2xl flex flex-col justify-between overflow-hidden relative min-h-[320px]">
+<div class="relative z-10 max-w-sm">
+<h4 class="font-headline-md text-headline-md text-primary mb-sm">Agent Committee</h4>
+<p class="font-body-md text-body-md text-on-surface-variant">Our unique consensus engine eliminates AI hallucination by requiring multiple agents to agree on data points before reporting.</p>
+</div>
+<div class="absolute bottom-0 right-0 w-1/2 h-full opacity-20 pointer-events-none">
+<div class="w-full h-full bg-[radial-gradient(circle_at_bottom_right,_#4edea3_0%,_transparent_70%)]"></div>
+</div>
+<div class="mt-lg flex gap-xs">
+<span class="px-sm py-1 bg-white/5 border border-white/10 rounded-full font-label-mono text-[10px] text-on-surface-variant">CROSS-EXAMINATION</span>
+<span class="px-sm py-1 bg-white/5 border border-white/10 rounded-full font-label-mono text-[10px] text-on-surface-variant">BIAS REDUCTION</span>
+<span class="px-sm py-1 bg-white/5 border border-white/10 rounded-full font-label-mono text-[10px] text-on-surface-variant">SOURCE CITATION</span>
+</div>
+</div>
+<!-- Explainable AI -->
+<div class="md:col-span-4 glass-card p-lg rounded-2xl flex flex-col bg-surface-container-low border-none">
+<span class="material-symbols-outlined text-secondary mb-md text-3xl">psychology_alt</span>
+<h4 class="font-headline-sm text-headline-sm text-primary mb-sm">Explainable AI</h4>
+<p class="font-body-md text-body-md text-on-surface-variant">No black boxes. Every claim made in a Verdict report is hyperlinked to the exact line in a SEC filing or earnings transcript.</p>
+</div>
+<!-- Real-time -->
+<div class="md:col-span-4 glass-card p-lg rounded-2xl flex flex-col bg-surface-container-low border-none">
+<span class="material-symbols-outlined text-primary mb-md text-3xl">bolt</span>
+<h4 class="font-headline-sm text-headline-sm text-primary mb-sm">Real-time Financials</h4>
+<p class="font-body-md text-body-md text-on-surface-variant">Streaming access to global markets and alternative datasets for up-to-the-second conviction analysis.</p>
+</div>
+<!-- Enterprise Ready -->
+<div class="md:col-span-8 glass-card p-lg rounded-2xl flex items-center gap-lg group cursor-pointer hover:border-white/20 transition-all">
+<div class="flex-1">
+<h4 class="font-headline-sm text-headline-sm text-primary mb-sm">Enterprise Data Integration</h4>
+<p class="font-body-md text-body-md text-on-surface-variant">Connect your internal research notes, private deal flows, and CRM data to customize the agents' knowledge base.</p>
+</div>
+<span class="material-symbols-outlined text-primary group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</div>
+</div>
+</section>
+<!-- Final CTA -->
+<section class="max-w-4xl mx-auto px-gutter py-xl text-center">
+<div class="glass-card py-xl px-lg rounded-[2.5rem] bg-gradient-to-br from-white/[0.03] to-transparent">
+<h2 class="font-display-lg text-display-lg text-primary mb-md">Upgrade your conviction.</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-xl mx-auto mb-lg">Join 2,500+ institutional analysts using VerdictAI to cut through the noise and find alpha faster.</p>
+<div class="flex flex-col sm:flex-row items-center justify-center gap-sm">
+<button class="bg-primary text-on-primary px-xl py-md rounded-xl font-bold text-lg hover:scale-95 transition-all w-full sm:w-auto">Get Started Free</button>
+<button class="px-xl py-md rounded-xl border border-white/10 font-bold text-lg hover:bg-white/5 transition-all w-full sm:w-auto">Contact Sales</button>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="mt-xl px-gutter py-xl border-t border-white/5 bg-surface-container-lowest">
+<div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-start gap-xl">
+<div class="space-y-sm">
+<span class="text-headline-sm font-bold text-primary">VerdictAI</span>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-xs">Institutional AI analyst committee for the modern investor.</p>
+<div class="flex items-center gap-md pt-sm">
+<a class="text-on-surface-variant hover:text-primary transition-colors" href="#"><span class="font-label-mono text-label-mono">X / TWITTER</span></a>
+<a class="text-on-surface-variant hover:text-primary transition-colors" href="#"><span class="font-label-mono text-label-mono">LINKEDIN</span></a>
+</div>
+</div>
+<div class="grid grid-cols-2 sm:grid-cols-3 gap-xl">
+<div class="space-y-sm">
+<h5 class="font-label-mono text-label-mono text-primary">PRODUCT</h5>
+<ul class="space-y-xs font-body-md text-body-md text-on-surface-variant">
+<li><a class="hover:text-primary transition-colors" href="#">Research Terminal</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">API Access</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Enterprise</a></li>
+</ul>
+</div>
+<div class="space-y-sm">
+<h5 class="font-label-mono text-label-mono text-primary">RESOURCES</h5>
+<ul class="space-y-xs font-body-md text-body-md text-on-surface-variant">
+<li><a class="hover:text-primary transition-colors" href="#">Documentation</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Research Methodology</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Help Center</a></li>
+</ul>
+</div>
+<div class="space-y-sm hidden sm:block">
+<h5 class="font-label-mono text-label-mono text-primary">LEGAL</h5>
+<ul class="space-y-xs font-body-md text-body-md text-on-surface-variant">
+<li><a class="hover:text-primary transition-colors" href="#">Privacy Policy</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Terms of Service</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Security</a></li>
+</ul>
+</div>
+</div>
+</div>
+<div class="max-w-6xl mx-auto pt-xl flex flex-col sm:flex-row justify-between items-center gap-md border-t border-white/5 mt-xl">
+<span class="font-label-mono text-[10px] text-on-surface-variant opacity-50">© 2024 VERDICTAI. ALL RIGHTS RESERVED.</span>
+<span class="font-label-mono text-[10px] text-on-surface-variant">BUILT BY <span class="text-primary">ALTUNI AI LABS</span></span>
+</div>
+</footer>
+<script>
+        // Micro-interaction for search input glow
+        const searchInput = document.querySelector('input[type="text"]');
+        const searchContainer = searchInput?.parentElement;
+
+        searchInput?.addEventListener('focus', () => {
+            searchContainer.classList.add('border-secondary/50');
+            searchContainer.style.boxShadow = '0 0 20px rgba(78, 222, 163, 0.1)';
+        });
+
+        searchInput?.addEventListener('blur', () => {
+            searchContainer.classList.remove('border-secondary/50');
+            searchContainer.style.boxShadow = 'none';
+        });
+
+        // Simple parallax effect for the workflow viz
+        window.addEventListener('mousemove', (e) => {
+            const moveX = (e.clientX - window.innerWidth / 2) * 0.01;
+            const moveY = (e.clientY - window.innerHeight / 2) * 0.01;
+            const viz = document.querySelector('.glass-card.aspect-\\[21\\/9\\]');
+            if(viz) {
+                viz.style.transform = `translate3d(${moveX}px, ${moveY}px, 0)`;
+            }
+        });
+    </script>
+</body></html>

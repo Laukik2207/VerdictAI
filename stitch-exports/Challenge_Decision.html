@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>VerdictAI - Challenge the Verdict</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .glass {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .glass-card:hover {
+            background: rgba(255, 255, 255, 0.04);
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+        .glow-blue {
+            box-shadow: 0 0 20px rgba(0, 96, 206, 0.2);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-lowest": "#0e0e0e",
+                        "surface-bright": "#3a3939",
+                        "surface": "#131313",
+                        "on-primary-fixed": "#1a1c1c",
+                        "on-surface": "#e5e2e1",
+                        "on-tertiary-fixed-variant": "#004395",
+                        "surface-variant": "#353534",
+                        "on-tertiary": "#002e6a",
+                        "background": "#131313",
+                        "outline-variant": "#444748",
+                        "inverse-on-surface": "#313030",
+                        "error": "#ffb4ab",
+                        "secondary-fixed": "#6ffbbe",
+                        "tertiary-fixed-dim": "#adc6ff",
+                        "secondary": "#4edea3",
+                        "on-surface-variant": "#c4c7c8",
+                        "on-tertiary-container": "#0060ce",
+                        "surface-container": "#201f1f",
+                        "tertiary-container": "#d8e2ff",
+                        "error-container": "#93000a",
+                        "on-primary-container": "#636565",
+                        "on-secondary-fixed": "#002113",
+                        "primary-fixed": "#e2e2e2",
+                        "primary-container": "#e2e2e2",
+                        "inverse-surface": "#e5e2e1",
+                        "surface-container-highest": "#353534",
+                        "primary": "#ffffff",
+                        "surface-container-low": "#1c1b1b",
+                        "on-background": "#e5e2e1",
+                        "inverse-primary": "#5d5f5f",
+                        "surface-tint": "#c6c6c7",
+                        "tertiary": "#ffffff",
+                        "primary-fixed-dim": "#c6c6c7",
+                        "on-error-container": "#ffdad6",
+                        "on-secondary-container": "#00311f",
+                        "on-tertiary-fixed": "#001a42",
+                        "on-secondary-fixed-variant": "#005236",
+                        "secondary-container": "#00a572",
+                        "secondary-fixed-dim": "#4edea3",
+                        "on-error": "#690005",
+                        "on-primary-fixed-variant": "#454747",
+                        "outline": "#8e9192",
+                        "on-secondary": "#003824",
+                        "surface-container-high": "#2a2a2a",
+                        "on-primary": "#2f3131",
+                        "surface-dim": "#131313",
+                        "tertiary-fixed": "#d8e2ff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "base": "4px",
+                        "gutter": "24px",
+                        "margin-safe": "32px",
+                        "md": "24px",
+                        "xs": "8px",
+                        "sm": "16px",
+                        "lg": "40px",
+                        "xl": "64px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "headline-md-mobile": ["Inter"],
+                        "label-mono": ["JetBrains Mono"],
+                        "headline-sm": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "body-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-md": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                        "headline-md-mobile": ["20px", {"lineHeight": "1.2", "fontWeight": "600"}],
+                        "label-mono": ["12px", {"lineHeight": "1.0", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                        "headline-sm": ["18px", {"lineHeight": "1.4", "fontWeight": "500"}],
+                        "headline-md": ["24px", {"lineHeight": "1.3", "letterSpacing": "-0.01em", "fontWeight": "500"}],
+                        "body-lg": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-background text-on-surface font-body-md selection:bg-on-tertiary-container selection:text-white">
+<!-- TopNavBar -->
+<header class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-gutter h-16 bg-surface border-b border-white/10">
+<div class="flex items-center gap-sm">
+<span class="text-headline-md font-headline-md font-bold text-primary">VerdictAI</span>
+<div class="h-4 w-px bg-outline-variant mx-sm"></div>
+<span class="text-on-surface-variant font-label-mono uppercase tracking-widest text-[10px]">Stress Test v4.2</span>
+</div>
+<div class="hidden md:flex items-center gap-lg">
+<nav class="flex gap-md h-full items-center">
+<a class="text-on-surface-variant font-body-md hover:opacity-80 transition-opacity" href="#">Research</a>
+<a class="text-on-surface-variant font-body-md hover:opacity-80 transition-opacity" href="#">History</a>
+<a class="text-on-surface-variant font-body-md hover:opacity-80 transition-opacity" href="#">Thesis</a>
+<a class="text-on-surface-variant font-body-md hover:opacity-80 transition-opacity" href="#">Reports</a>
+</nav>
+<div class="flex items-center gap-sm">
+<button class="px-sm py-1.5 border border-white/10 rounded font-body-md hover:bg-white/5 transition-colors">Compare</button>
+<button class="px-sm py-1.5 bg-primary text-on-primary rounded font-body-md font-semibold hover:opacity-90 active:scale-95 transition-all">Export</button>
+</div>
+</div>
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer">notifications</span>
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer">settings</span>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-white/10">
+<img class="w-full h-full object-cover" data-alt="A professional studio portrait of a high-end financial analyst, featuring soft overhead lighting that emphasizes a serious and focused expression. The background is a blurred, dark minimalist office environment with subtle blue and white light accents. The image follows a high-contrast monochromatic style with sharp details and premium finish." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAtW9Lid9q-HWbzg3cetm-6si_IOpKq8F3lAJKWs7Z066ecUx_bM-euSIhxpm0NErw5KFlG0_Sd2SZ13EZJ4281y6rdM1cGVVdzl0xTAFG-CCEC9OPrOq_qgNUCON8-niFPtkNCqoGgyQybj-hB27btqfeUIthMLLtS9Fk7GjuV_0w53_roWfbidPNEt3Omiovu2gB_P3DgE9pFt5RO-qXVAz09n0o8RdKoZdw6_0sqYy5Ur66sIjSoU2TzLJqgH4n5J_U9KYxOygo"/>
+</div>
+</div>
+</header>
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-16 h-[calc(100vh-64px)] w-64 bg-surface-container-low border-r border-white/5 flex flex-col p-sm z-40">
+<div class="mb-lg px-xs">
+<div class="flex items-center gap-sm p-sm">
+<div class="w-8 h-8 rounded bg-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-background" style="font-variation-settings: 'FILL' 1;">gavel</span>
+</div>
+<div>
+<div class="font-headline-sm text-headline-sm font-semibold text-primary">VerdictAI</div>
+<div class="text-[10px] text-on-surface-variant font-label-mono">Institutional Research</div>
+</div>
+</div>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-sm px-sm py-3 text-on-surface-variant hover:bg-white/5 rounded-lg transition-colors group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors">search_insights</span>
+<span class="font-label-mono text-label-mono">Research</span>
+</a>
+<a class="flex items-center gap-sm px-sm py-3 text-on-surface-variant hover:bg-white/5 rounded-lg transition-colors group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors">payments</span>
+<span class="font-label-mono text-label-mono">Financials</span>
+</a>
+<a class="flex items-center gap-sm px-sm py-3 text-on-surface-variant hover:bg-white/5 rounded-lg transition-colors group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors">analytics</span>
+<span class="font-label-mono text-label-mono">Sentiment</span>
+</a>
+<a class="flex items-center gap-sm px-sm py-3 text-on-surface-variant hover:bg-white/5 rounded-lg transition-colors group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors">warning</span>
+<span class="font-label-mono text-label-mono">Risk</span>
+</a>
+<a class="flex items-center gap-sm px-sm py-3 text-primary font-bold bg-white/5 rounded-lg transition-all group" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">gavel</span>
+<span class="font-label-mono text-label-mono">Verdict</span>
+</a>
+</nav>
+<div class="mt-auto space-y-1 pt-sm border-t border-white/5">
+<a class="flex items-center gap-sm px-sm py-2 text-on-surface-variant hover:bg-white/5 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">help</span>
+<span class="font-label-mono text-label-mono">Help</span>
+</a>
+<a class="flex items-center gap-sm px-sm py-2 text-on-surface-variant hover:bg-white/5 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">history</span>
+<span class="font-label-mono text-label-mono">Archive</span>
+</a>
+<button class="w-full mt-md py-3 bg-primary text-on-primary font-semibold rounded-lg hover:opacity-90 transition-all flex items-center justify-center gap-xs">
+<span class="material-symbols-outlined text-[18px]">add</span>
+                New Analysis
+            </button>
+</div>
+</aside>
+<!-- Main Canvas -->
+<main class="pl-64 pt-16 min-h-screen">
+<div class="max-w-[1200px] mx-auto p-gutter animate-in fade-in duration-700">
+<!-- Header Section -->
+<div class="mb-lg flex justify-between items-end">
+<div>
+<div class="flex items-center gap-sm mb-xs">
+<span class="px-2 py-0.5 bg-on-tertiary-container/20 text-on-tertiary-container rounded text-[10px] font-label-mono border border-on-tertiary-container/30 uppercase">Active Debate</span>
+<h1 class="text-headline-md font-headline-md font-bold tracking-tight">Challenge the Verdict — NVDA</h1>
+</div>
+<p class="text-on-surface-variant max-w-xl">Deep stress-testing of current institutional consensus via multi-agent dialectic analysis and adversarial variable shifting.</p>
+</div>
+<div class="flex items-center gap-sm">
+<div class="text-right">
+<div class="text-label-mono text-on-surface-variant opacity-50">CONFIDENCE SCORE</div>
+<div class="text-headline-md font-bold text-secondary">88.4%</div>
+</div>
+</div>
+</div>
+<!-- Dual Thesis View -->
+<div class="grid grid-cols-1 lg:grid-cols-11 gap-md items-stretch mb-lg">
+<!-- Bullish Thesis -->
+<div class="lg:col-span-4 glass-card p-sm rounded-xl relative overflow-hidden group">
+<div class="absolute top-0 right-0 p-sm opacity-20 group-hover:opacity-40 transition-opacity">
+<span class="material-symbols-outlined text-[48px]">trending_up</span>
+</div>
+<div class="mb-md">
+<div class="font-label-mono text-secondary mb-xs tracking-tighter">PRIMARY THESIS (BULL)</div>
+<h2 class="font-headline-sm text-headline-sm font-bold">Unrivaled AI Dominance</h2>
+</div>
+<ul class="space-y-sm text-body-md text-on-surface-variant mb-md">
+<li class="flex gap-xs">
+<span class="material-symbols-outlined text-secondary text-[18px]">check_circle</span>
+<span>CUDA Moat: Developer lock-in remains unbreakable for top-tier training tasks.</span>
+</li>
+<li class="flex gap-xs">
+<span class="material-symbols-outlined text-secondary text-[18px]">check_circle</span>
+<span>H200/B100 Cycle: Next-gen hardware orders exceeding supply for 2025.</span>
+</li>
+<li class="flex gap-xs">
+<span class="material-symbols-outlined text-secondary text-[18px]">check_circle</span>
+<span>Data Center Growth: Enterprise adoption expanding beyond hyperscalers.</span>
+</li>
+</ul>
+<div class="p-sm bg-white/5 rounded-lg border border-white/5">
+<div class="flex justify-between text-[11px] font-label-mono mb-xs">
+<span>BULL TARGET</span>
+<span class="text-secondary">$1,150.00</span>
+</div>
+<div class="h-1 bg-white/10 rounded-full overflow-hidden">
+<div class="h-full bg-secondary w-[85%]"></div>
+</div>
+</div>
+</div>
+<!-- Central Debate Progress -->
+<div class="lg:col-span-3 flex flex-col justify-center items-center gap-md">
+<div class="relative w-full flex flex-col items-center">
+<div class="absolute inset-0 flex items-center justify-center opacity-10">
+
+</div>
+<div class="relative z-10 flex flex-col items-center gap-sm">
+<div class="w-20 h-20 rounded-full border-2 border-dashed border-on-tertiary-container flex items-center justify-center animate-[spin_20s_linear_infinite]">
+<span class="material-symbols-outlined text-on-tertiary-container text-[32px] rotate-[-15deg]">diversity_2</span>
+</div>
+<div class="text-center">
+<div class="text-label-mono text-on-tertiary-container animate-pulse mb-1">AGENTS DEBATING...</div>
+<div class="text-[10px] text-on-surface-variant font-label-mono uppercase tracking-widest opacity-60">Synthesis in Progress</div>
+</div>
+</div>
+<!-- Mini Timeline of Logic Nodes -->
+<div class="mt-md w-full space-y-2 px-md">
+<div class="flex items-center gap-xs">
+<div class="w-1.5 h-1.5 rounded-full bg-secondary"></div>
+<div class="h-px flex-1 bg-white/5"></div>
+<span class="text-[10px] font-label-mono text-on-surface-variant">Supply Chain Verified</span>
+</div>
+<div class="flex items-center gap-xs">
+<div class="w-1.5 h-1.5 rounded-full bg-on-tertiary-container"></div>
+<div class="h-px flex-1 bg-white/5"></div>
+<span class="text-[10px] font-label-mono text-on-tertiary-container">Challenging Capex Sustainability</span>
+</div>
+<div class="flex items-center gap-xs">
+<div class="w-1.5 h-1.5 rounded-full bg-white/20"></div>
+<div class="h-px flex-1 bg-white/5"></div>
+<span class="text-[10px] font-label-mono opacity-40">Macro Factor Evaluation</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Counter Thesis -->
+<div class="lg:col-span-4 glass-card p-sm rounded-xl relative overflow-hidden group">
+<div class="absolute top-0 right-0 p-sm opacity-20 group-hover:opacity-40 transition-opacity">
+<span class="material-symbols-outlined text-[48px]">trending_down</span>
+</div>
+<div class="mb-md">
+<div class="font-label-mono text-error mb-xs tracking-tighter">COUNTER-THESIS (BEAR)</div>
+<h2 class="font-headline-sm text-headline-sm font-bold">The "Indigestion" Risk</h2>
+</div>
+<ul class="space-y-sm text-body-md text-on-surface-variant mb-md">
+<li class="flex gap-xs">
+<span class="material-symbols-outlined text-error text-[18px]">emergency_home</span>
+<span>Margin Erosion: ASICs and internal chip development by CSPs.</span>
+</li>
+<li class="flex gap-xs">
+<span class="material-symbols-outlined text-error text-[18px]">warning</span>
+<span>Interest Rates: Higher-for-longer dampening tech multiples.</span>
+</li>
+<li class="flex gap-xs">
+<span class="material-symbols-outlined text-error text-[18px]">crisis_alert</span>
+<span>Overcapacity: Potential pause in GPU spending as ROI is scrutinized.</span>
+</li>
+</ul>
+<div class="p-sm bg-white/5 rounded-lg border border-white/5">
+<div class="flex justify-between text-[11px] font-label-mono mb-xs">
+<span>BEAR TARGET</span>
+<span class="text-error">$720.00</span>
+</div>
+<div class="h-1 bg-white/10 rounded-full overflow-hidden">
+<div class="h-full bg-error w-[40%]"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Bento Grid Interactive Sections -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-md mb-lg">
+<!-- What Could Change (Sliders) -->
+<div class="md:col-span-2 glass-card p-md rounded-xl">
+<div class="flex justify-between items-center mb-lg">
+<h3 class="font-headline-sm font-bold">Dynamic Variable Sensitivity</h3>
+<span class="material-symbols-outlined text-on-surface-variant cursor-help">info</span>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-xl">
+<!-- Slider 1 -->
+<div class="space-y-md">
+<div class="flex justify-between items-end">
+<label class="text-[11px] font-label-mono text-on-surface-variant">OPERATING MARGIN (%)</label>
+<span class="text-headline-sm font-bold text-primary">54.5%</span>
+</div>
+<input class="w-full h-1.5 bg-white/10 rounded-lg appearance-none cursor-pointer accent-primary" max="65" min="40" type="range" value="54"/>
+<div class="flex justify-between text-[9px] font-label-mono opacity-40">
+<span>MIN (40%)</span>
+<span>TARGET</span>
+<span>MAX (65%)</span>
+</div>
+</div>
+<!-- Slider 2 -->
+<div class="space-y-md">
+<div class="flex justify-between items-end">
+<label class="text-[11px] font-label-mono text-on-surface-variant">FED FUNDS RATE (%)</label>
+<span class="text-headline-sm font-bold text-primary">5.25%</span>
+</div>
+<input class="w-full h-1.5 bg-white/10 rounded-lg appearance-none cursor-pointer accent-on-tertiary-container" max="10" min="0" type="range" value="5"/>
+<div class="flex justify-between text-[9px] font-label-mono opacity-40">
+<span>0% DOVE</span>
+<span>CURRENT</span>
+<span>10% HAWK</span>
+</div>
+</div>
+<!-- Slider 3 -->
+<div class="space-y-md">
+<div class="flex justify-between items-end">
+<label class="text-[11px] font-label-mono text-on-surface-variant">CHINA SALES RECOVERY</label>
+<span class="text-headline-sm font-bold text-primary">MODERATE</span>
+</div>
+<div class="flex gap-2">
+<button class="flex-1 py-2 text-[10px] font-label-mono bg-white/10 rounded border border-white/5 hover:bg-white/20">LOW</button>
+<button class="flex-1 py-2 text-[10px] font-label-mono bg-primary text-background rounded border border-white/5">MED</button>
+<button class="flex-1 py-2 text-[10px] font-label-mono bg-white/10 rounded border border-white/5 hover:bg-white/20">HIGH</button>
+</div>
+</div>
+<!-- Slider 4 -->
+<div class="space-y-md">
+<div class="flex justify-between items-end">
+<label class="text-[11px] font-label-mono text-on-surface-variant">AI ROI ADOPTION VELOCITY</label>
+<span class="text-headline-sm font-bold text-primary">8.2 / 10</span>
+</div>
+<input class="w-full h-1.5 bg-white/10 rounded-lg appearance-none cursor-pointer accent-secondary" max="10" min="0" type="range" value="8"/>
+</div>
+</div>
+</div>
+<!-- Decision Comparison -->
+<div class="glass-card p-md rounded-xl border-l-4 border-on-tertiary-container">
+<div class="mb-md">
+<h3 class="font-headline-sm font-bold mb-xs">Verdict Shift</h3>
+<p class="text-[12px] text-on-surface-variant">Real-time re-evaluation under selected parameters.</p>
+</div>
+<div class="space-y-lg">
+<div class="flex items-center justify-between">
+<span class="text-body-md">Initial Score</span>
+<span class="text-body-md font-bold">92/100</span>
+</div>
+<div class="flex flex-col items-center py-sm">
+<div class="text-[48px] font-bold leading-none mb-1">84</div>
+<div class="text-[10px] font-label-mono text-on-tertiary-container tracking-tighter">-8.0% ADJUSTMENT</div>
+</div>
+<div class="space-y-sm">
+<div class="flex justify-between text-[11px] font-label-mono">
+<span>CURRENT RATING</span>
+<span class="text-secondary">STRONG BUY</span>
+</div>
+<div class="flex justify-between text-[11px] font-label-mono">
+<span>STRESS-TEST RATING</span>
+<span class="text-primary">ACCUMULATE</span>
+</div>
+</div>
+<button class="w-full py-3 bg-white/5 border border-white/10 rounded-lg font-label-mono text-[11px] uppercase tracking-widest hover:bg-white/10 transition-colors">
+                            Lock Scenario
+                        </button>
+</div>
+</div>
+</div>
+<!-- Outcome Timeline -->
+<div class="glass-card p-md rounded-xl overflow-hidden relative">
+<div class="flex justify-between items-center mb-lg">
+<div>
+<h3 class="font-headline-sm font-bold">Projected Performance Corridor</h3>
+<p class="text-[12px] text-on-surface-variant">Estimated trajectory 12-24 months out.</p>
+</div>
+<div class="flex gap-md">
+<div class="flex items-center gap-xs">
+<div class="w-2 h-2 rounded-full bg-secondary"></div>
+<span class="text-[10px] font-label-mono">Optimistic</span>
+</div>
+<div class="flex items-center gap-xs">
+<div class="w-2 h-2 rounded-full bg-white/40"></div>
+<span class="text-[10px] font-label-mono">Base Case</span>
+</div>
+<div class="flex items-center gap-xs">
+<div class="w-2 h-2 rounded-full bg-error"></div>
+<span class="text-[10px] font-label-mono">Stress (Bear)</span>
+</div>
+</div>
+</div>
+<div class="h-64 w-full relative">
+<!-- Graph Mockup -->
+<svg class="w-full h-full" viewbox="0 0 1000 300">
+<defs>
+<lineargradient id="bullGrad" x1="0" x2="0" y1="0" y2="1">
+<stop offset="0%" stop-color="#4edea3" stop-opacity="0.2"></stop>
+<stop offset="100%" stop-color="#4edea3" stop-opacity="0"></stop>
+</lineargradient>
+</defs>
+<!-- Grid Lines -->
+<line stroke="white" stroke-opacity="0.05" x1="0" x2="1000" y1="50" y2="50"></line>
+<line stroke="white" stroke-opacity="0.05" x1="0" x2="1000" y1="150" y2="150"></line>
+<line stroke="white" stroke-opacity="0.05" x1="0" x2="1000" y1="250" y2="250"></line>
+<!-- Area Fill -->
+<path d="M0,200 Q250,180 500,100 T1000,50 L1000,250 Q750,260 500,280 T0,280 Z" fill="url(#bullGrad)"></path>
+<!-- Projection Lines -->
+<path d="M0,200 Q250,180 500,100 T1000,50" fill="none" stroke="#4edea3" stroke-width="2"></path>
+<path d="M0,200 Q250,210 500,200 T1000,180" fill="none" opacity="0.4" stroke="white" stroke-dasharray="8,4" stroke-width="2"></path>
+<path d="M0,200 Q250,230 500,260 T1000,280" fill="none" stroke="#ffb4ab" stroke-width="2"></path>
+<!-- Timeline Markers -->
+<g fill="white" font-family="JetBrains Mono" font-size="10" opacity="0.4">
+<text x="0" y="295">MAY 24</text>
+<text x="250" y="295">NOV 24</text>
+<text x="500" y="295">MAY 25</text>
+<text x="750" y="295">NOV 25</text>
+<text x="960" y="295">MAY 26</text>
+</g>
+</svg>
+</div>
+<div class="mt-md flex justify-between p-sm bg-white/5 rounded-lg">
+<div class="text-center flex-1 border-r border-white/5">
+<div class="text-[10px] font-label-mono opacity-50 mb-1 uppercase">12M PT (BULL)</div>
+<div class="font-bold text-secondary">$1,280.00</div>
+</div>
+<div class="text-center flex-1 border-r border-white/5">
+<div class="text-[10px] font-label-mono opacity-50 mb-1 uppercase">12M PT (BASE)</div>
+<div class="font-bold">$940.00</div>
+</div>
+<div class="text-center flex-1">
+<div class="text-[10px] font-label-mono opacity-50 mb-1 uppercase">12M PT (BEAR)</div>
+<div class="font-bold text-error">$680.00</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Interactive Layer for Agent Logs -->
+<div class="fixed bottom-gutter right-gutter w-80 z-50">
+<div class="glass rounded-xl overflow-hidden border border-white/10 shadow-2xl">
+<div class="bg-surface px-sm py-2 flex justify-between items-center border-b border-white/5">
+<div class="flex items-center gap-xs">
+<div class="w-2 h-2 rounded-full bg-on-tertiary-container animate-pulse"></div>
+<span class="text-[10px] font-label-mono uppercase tracking-widest">Logic Stream</span>
+</div>
+<span class="material-symbols-outlined text-[16px] cursor-pointer hover:text-white transition-colors">close</span>
+</div>
+<div class="h-48 p-sm overflow-y-auto space-y-md font-label-mono text-[11px] text-on-surface-variant">
+<div class="space-y-1">
+<div class="text-on-tertiary-container">[Agent Alpha]</div>
+<p class="leading-relaxed opacity-80">"Challenging Q3 revenue guidance. Demand for H100 exceeds TSMC capacity by 12%."</p>
+</div>
+<div class="space-y-1">
+<div class="text-secondary">[Agent Delta]</div>
+<p class="leading-relaxed opacity-80">"Counter: Blackwell transition is smoothing supply gaps. Bull thesis intact."</p>
+</div>
+<div class="space-y-1">
+<div class="text-error">[Agent Omega]</div>
+<p class="leading-relaxed opacity-80">"Macro alert: Sustained high rates could compress multiples by 15-18% by year-end."</p>
+</div>
+<div class="space-y-1">
+<div class="text-on-tertiary-container text-[9px] opacity-30 italic">Calculating probability cross-correlation...</div>
+</div>
+</div>
+<div class="p-sm bg-white/5">
+<div class="flex gap-xs">
+<input class="flex-1 bg-transparent border-white/10 rounded text-[11px] placeholder:text-white/20 focus:ring-0 focus:border-on-tertiary-container" placeholder="Challenge a specific point..." type="text"/>
+<button class="w-8 h-8 bg-on-tertiary-container text-white rounded flex items-center justify-center">
+<span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<script>
+        // Micro-interaction for sliders
+        const sliders = document.querySelectorAll('input[type="range"]');
+        sliders.forEach(slider => {
+            slider.addEventListener('input', (e) => {
+                const val = e.target.value;
+                const parent = e.target.closest('.space-y-md');
+                const display = parent.querySelector('.text-headline-sm');
+                
+                // Simulated logic mapping based on label
+                const label = parent.querySelector('label').innerText;
+                if(label.includes('MARGIN')) {
+                    display.innerText = `${val}%`;
+                } else if(label.includes('RATE')) {
+                    display.innerText = `${(val/10).toFixed(2)}%`;
+                } else if(label.includes('VELOCITY')) {
+                    display.innerText = `${val} / 10`;
+                }
+                
+                // Add a visual 'ping' to the verdict card
+                const verdict = document.querySelector('.border-on-tertiary-container');
+                verdict.classList.add('glow-blue');
+                setTimeout(() => verdict.classList.remove('glow-blue'), 300);
+            });
+        });
+    </script>
+</body></html>

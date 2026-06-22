@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>VerdictAI | Research Workspace</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container-lowest": "#0e0e0e",
+                    "surface-bright": "#3a3939",
+                    "surface": "#131313",
+                    "on-primary-fixed": "#1a1c1c",
+                    "on-surface": "#e5e2e1",
+                    "on-tertiary-fixed-variant": "#004395",
+                    "surface-variant": "#353534",
+                    "on-tertiary": "#002e6a",
+                    "background": "#131313",
+                    "outline-variant": "#444748",
+                    "inverse-on-surface": "#313030",
+                    "error": "#ffb4ab",
+                    "secondary-fixed": "#6ffbbe",
+                    "tertiary-fixed-dim": "#adc6ff",
+                    "secondary": "#4edea3",
+                    "on-surface-variant": "#c4c7c8",
+                    "on-tertiary-container": "#0060ce",
+                    "surface-container": "#201f1f",
+                    "tertiary-container": "#d8e2ff",
+                    "error-container": "#93000a",
+                    "on-primary-container": "#636565",
+                    "on-secondary-fixed": "#002113",
+                    "primary-fixed": "#e2e2e2",
+                    "primary-container": "#e2e2e2",
+                    "inverse-surface": "#e5e2e1",
+                    "surface-container-highest": "#353534",
+                    "primary": "#ffffff",
+                    "surface-container-low": "#1c1b1b",
+                    "on-background": "#e5e2e1",
+                    "inverse-primary": "#5d5f5f",
+                    "surface-tint": "#c6c6c7",
+                    "tertiary": "#ffffff",
+                    "primary-fixed-dim": "#c6c6c7",
+                    "on-error-container": "#ffdad6",
+                    "on-secondary-container": "#00311f",
+                    "on-tertiary-fixed": "#001a42",
+                    "on-secondary-fixed-variant": "#005236",
+                    "secondary-container": "#00a572",
+                    "secondary-fixed-dim": "#4edea3",
+                    "on-error": "#690005",
+                    "on-primary-fixed-variant": "#454747",
+                    "outline": "#8e9192",
+                    "on-secondary": "#003824",
+                    "surface-container-high": "#2a2a2a",
+                    "on-primary": "#2f3131",
+                    "surface-dim": "#131313",
+                    "tertiary-fixed": "#d8e2ff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "base": "4px",
+                    "gutter": "24px",
+                    "margin-safe": "32px",
+                    "md": "24px",
+                    "xs": "8px",
+                    "sm": "16px",
+                    "lg": "40px",
+                    "xl": "64px"
+            },
+            "fontFamily": {
+                    "body-md": ["Inter"],
+                    "display-lg": ["Inter"],
+                    "headline-md-mobile": ["Inter"],
+                    "label-mono": ["JetBrains Mono"],
+                    "headline-sm": ["Inter"],
+                    "headline-md": ["Inter"],
+                    "body-lg": ["Inter"]
+            },
+            "fontSize": {
+                    "body-md": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                    "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                    "headline-md-mobile": ["20px", {"lineHeight": "1.2", "fontWeight": "600"}],
+                    "label-mono": ["12px", {"lineHeight": "1.0", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                    "headline-sm": ["18px", {"lineHeight": "1.4", "fontWeight": "500"}],
+                    "headline-md": ["24px", {"lineHeight": "1.3", "letterSpacing": "-0.01em", "fontWeight": "500"}],
+                    "body-lg": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .glass-card {
+            background: rgba(32, 31, 31, 0.4);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .terminal-scroll::-webkit-scrollbar { width: 4px; }
+        .terminal-scroll::-webkit-scrollbar-track { background: transparent; }
+        .terminal-scroll::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 10px; }
+        @keyframes pulse-soft { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        .animate-pulse-soft { animation: pulse-soft 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+        .agent-line::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.1);
+            z-index: 0;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md selection:bg-secondary/30">
+<!-- TopNavBar -->
+<nav class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-gutter h-16 bg-surface border-b border-white/10 no shadows">
+<div class="flex items-center gap-sm">
+<span class="text-headline-md font-headline-md font-bold text-primary">VerdictAI</span>
+</div>
+<div class="hidden md:flex items-center gap-lg">
+<a class="text-primary border-b-2 border-primary pb-1 font-body-md text-body-md hover:opacity-80 transition-opacity" href="#">Research</a>
+<a class="text-on-surface-variant font-body-md text-body-md hover:opacity-80 transition-opacity" href="#">History</a>
+<a class="text-on-surface-variant font-body-md text-body-md hover:opacity-80 transition-opacity" href="#">Thesis</a>
+<a class="text-on-surface-variant font-body-md text-body-md hover:opacity-80 transition-opacity" href="#">Reports</a>
+</div>
+<div class="flex items-center gap-md">
+<button class="bg-surface-container-high px-sm py-xs rounded text-body-md hover:opacity-80 transition-opacity">Compare</button>
+<button class="bg-primary text-on-primary px-sm py-xs rounded font-medium text-body-md active:scale-95 transition-transform duration-200">Export</button>
+<div class="flex gap-sm border-l border-white/10 pl-md">
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:text-primary">notifications</span>
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:text-primary">settings</span>
+<img class="w-8 h-8 rounded-full border border-white/10" data-alt="A professional headshot of a financial analyst, looking focused and wearing high-end spectacles. The lighting is moody and cinematic with soft blue rim lighting against a dark corporate background. The image has a clean, high-resolution aesthetic suitable for a premium enterprise platform." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCOdtvzn528jJivlb57KgzAad9TeDRpIfCKSUGsm7_EQRfmdmxlpeX7BUCe9AZkmGIGV91YgE6Gs5CiCaZ-B23hGBLEmGCfyOGDJuaw6gVuGbjkjOzMJLAaW72SmTr_VQbl4oSUM8VdAwbBAbey8Jfu50lTryQhH4tEgTS9uh2QmsMwBYHVkBuP2IfbTfI1GhG4qnteQlY1eoxnIQ6LVJJ1IxFCo5g2vvugLKRl7WfZROMpaj1aUGdAiD6kTYKGjXUYbZ7gBbOq4GA"/>
+</div>
+</div>
+</nav>
+<div class="flex pt-16 h-screen overflow-hidden">
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-16 h-[calc(100vh-64px)] w-64 flex flex-col p-sm bg-surface-container-low border-r border-white/5 no shadows z-40">
+<div class="flex flex-col gap-xs mb-lg">
+<div class="flex items-center gap-sm p-xs mb-sm">
+<div class="w-8 h-8 rounded bg-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary" style="font-variation-settings: 'FILL' 1;">gavel</span>
+</div>
+<div>
+<div class="font-headline-sm text-headline-sm font-semibold text-primary">VerdictAI</div>
+<div class="text-[10px] text-on-surface-variant uppercase tracking-widest font-label-mono">Institutional Research</div>
+</div>
+</div>
+<button class="w-full flex items-center justify-center gap-xs bg-primary text-on-primary py-sm rounded-lg font-bold mb-md active:scale-[0.98] transition-all">
+<span class="material-symbols-outlined text-[18px]">add</span>
+                    New Analysis
+                </button>
+<nav class="flex flex-col gap-xs">
+<div class="text-primary font-bold bg-white/5 rounded-lg flex items-center gap-sm px-sm py-sm font-label-mono text-label-mono cursor-pointer transition-colors">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">search_insights</span>
+                        Research
+                    </div>
+<div class="text-on-surface-variant hover:bg-white/5 flex items-center gap-sm px-sm py-sm font-label-mono text-label-mono rounded-lg cursor-pointer transition-colors">
+<span class="material-symbols-outlined">payments</span>
+                        Financials
+                    </div>
+<div class="text-on-surface-variant hover:bg-white/5 flex items-center gap-sm px-sm py-sm font-label-mono text-label-mono rounded-lg cursor-pointer transition-colors">
+<span class="material-symbols-outlined">analytics</span>
+                        Sentiment
+                    </div>
+<div class="text-on-surface-variant hover:bg-white/5 flex items-center gap-sm px-sm py-sm font-label-mono text-label-mono rounded-lg cursor-pointer transition-colors">
+<span class="material-symbols-outlined">warning</span>
+                        Risk
+                    </div>
+<div class="text-on-surface-variant hover:bg-white/5 flex items-center gap-sm px-sm py-sm font-label-mono text-label-mono rounded-lg cursor-pointer transition-colors">
+<span class="material-symbols-outlined">gavel</span>
+                        Verdict
+                    </div>
+</nav>
+</div>
+<div class="mt-auto border-t border-white/5 pt-md">
+<div class="flex flex-col gap-xs">
+<div class="text-on-surface-variant hover:bg-white/5 flex items-center gap-sm px-sm py-sm font-label-mono text-label-mono rounded-lg cursor-pointer transition-colors">
+<span class="material-symbols-outlined">help</span>
+                        Help
+                    </div>
+<div class="text-on-surface-variant hover:bg-white/5 flex items-center gap-sm px-sm py-sm font-label-mono text-label-mono rounded-lg cursor-pointer transition-colors">
+<span class="material-symbols-outlined">history</span>
+                        Archive
+                    </div>
+</div>
+</div>
+</aside>
+<!-- Main Workspace -->
+<main class="ml-64 mr-80 flex-1 overflow-y-auto bg-surface-container-lowest p-gutter relative">
+<!-- Company Search / Header -->
+<header class="mb-lg">
+<div class="flex items-center gap-md glass-card rounded-xl px-md py-sm">
+<span class="material-symbols-outlined text-on-surface-variant">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-body-lg font-body-lg text-primary w-full" placeholder="Search company ticker or name..." type="text" value="NVIDIA Corporation (NVDA)"/>
+<div class="flex items-center gap-xs bg-secondary/10 px-sm py-xs rounded border border-secondary/20">
+<div class="w-2 h-2 rounded-full bg-secondary animate-pulse"></div>
+<span class="text-secondary font-label-mono text-label-mono">LIVE ANALYSIS</span>
+</div>
+</div>
+</header>
+<!-- Agent Timeline -->
+<section class="mb-xl relative">
+<div class="flex justify-between items-center agent-line relative px-sm">
+<!-- Research Agent -->
+<div class="flex flex-col items-center gap-xs relative z-10">
+<div class="w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-on-secondary shadow-[0_0_15px_rgba(78,222,163,0.3)]">
+<span class="material-symbols-outlined">travel_explore</span>
+</div>
+<span class="font-label-mono text-label-mono text-secondary">RESEARCH</span>
+</div>
+<!-- Financial Agent -->
+<div class="flex flex-col items-center gap-xs relative z-10">
+<div class="w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-on-secondary shadow-[0_0_15px_rgba(78,222,163,0.3)]">
+<span class="material-symbols-outlined">finance_mode</span>
+</div>
+<span class="font-label-mono text-label-mono text-secondary">FINANCIALS</span>
+</div>
+<!-- Sentiment Agent -->
+<div class="flex flex-col items-center gap-xs relative z-10">
+<div class="w-10 h-10 rounded-full bg-surface-container-high border border-secondary flex items-center justify-center text-secondary animate-pulse-soft">
+<span class="material-symbols-outlined">forum</span>
+</div>
+<span class="font-label-mono text-label-mono text-secondary">SENTIMENT</span>
+</div>
+<!-- Risk Agent -->
+<div class="flex flex-col items-center gap-xs relative z-10 opacity-50">
+<div class="w-10 h-10 rounded-full bg-surface-container-high border border-white/10 flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined">warning</span>
+</div>
+<span class="font-label-mono text-label-mono text-on-surface-variant">RISK</span>
+</div>
+<!-- Judge Agent -->
+<div class="flex flex-col items-center gap-xs relative z-10 opacity-50">
+<div class="w-10 h-10 rounded-full bg-surface-container-high border border-white/10 flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined">gavel</span>
+</div>
+<span class="font-label-mono text-label-mono text-on-surface-variant">VERDICT</span>
+</div>
+</div>
+</section>
+<!-- Agent Cards Grid -->
+<section class="grid grid-cols-2 gap-md mb-xl">
+<!-- Research Card -->
+<div class="glass-card rounded-xl p-md flex flex-col gap-sm">
+<div class="flex justify-between items-start">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-secondary">travel_explore</span>
+<span class="font-headline-sm text-headline-sm text-primary">Research Agent</span>
+</div>
+<span class="text-secondary font-label-mono text-label-mono px-xs py-[2px] bg-secondary/10 rounded">COMPLETE</span>
+</div>
+<div class="space-y-xs">
+<div class="h-1 w-full bg-white/5 rounded-full overflow-hidden">
+<div class="h-full bg-secondary w-full"></div>
+</div>
+<div class="font-label-mono text-[11px] text-on-surface-variant italic">
+                            &gt; Analysis of NVDA market positioning finished. 2.4k nodes scanned.
+                        </div>
+</div>
+</div>
+<!-- Financial Card -->
+<div class="glass-card rounded-xl p-md flex flex-col gap-sm">
+<div class="flex justify-between items-start">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-secondary">finance_mode</span>
+<span class="font-headline-sm text-headline-sm text-primary">Financial Agent</span>
+</div>
+<span class="text-secondary font-label-mono text-label-mono px-xs py-[2px] bg-secondary/10 rounded">COMPLETE</span>
+</div>
+<div class="space-y-xs">
+<div class="h-1 w-full bg-white/5 rounded-full overflow-hidden">
+<div class="h-full bg-secondary w-full"></div>
+</div>
+<div class="font-label-mono text-[11px] text-on-surface-variant italic">
+                            &gt; 10-K and 10-Q ingestion complete. DCF model calibrated.
+                        </div>
+</div>
+</div>
+<!-- Sentiment Card (Active) -->
+<div class="glass-card rounded-xl p-md flex flex-col gap-sm ring-1 ring-secondary/30">
+<div class="flex justify-between items-start">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-secondary animate-spin" style="animation-duration: 4s">forum</span>
+<span class="font-headline-sm text-headline-sm text-primary">Sentiment Agent</span>
+</div>
+<span class="text-secondary font-label-mono text-label-mono px-xs py-[2px] bg-secondary/10 rounded animate-pulse">PROCESSING...</span>
+</div>
+<div class="space-y-xs">
+<div class="h-1 w-full bg-white/10 rounded-full overflow-hidden">
+<div class="h-full bg-secondary w-[65%]"></div>
+</div>
+<div class="font-label-mono text-[11px] text-primary italic">
+                            &gt; Scraping earnings call transcripts and analyst social sentiment...
+                        </div>
+</div>
+</div>
+<!-- Risk Card (Pending) -->
+<div class="glass-card rounded-xl p-md flex flex-col gap-sm opacity-50">
+<div class="flex justify-between items-start">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-on-surface-variant">warning</span>
+<span class="font-headline-sm text-headline-sm text-primary">Risk Agent</span>
+</div>
+<span class="text-on-surface-variant font-label-mono text-label-mono px-xs py-[2px] bg-white/5 rounded">QUEUED</span>
+</div>
+<div class="space-y-xs">
+<div class="h-1 w-full bg-white/5 rounded-full overflow-hidden">
+<div class="h-full bg-secondary w-0"></div>
+</div>
+<div class="font-label-mono text-[11px] text-on-surface-variant italic">
+                            &gt; Awaiting upstream inputs from Sentiment and Financials.
+                        </div>
+</div>
+</div>
+</section>
+<!-- Execution Log / Terminal -->
+<footer class="glass-card rounded-xl overflow-hidden border-none">
+<div class="bg-surface-container-high px-md py-xs border-b border-white/5 flex justify-between items-center">
+<span class="font-label-mono text-label-mono text-on-surface-variant uppercase tracking-tighter">Live Execution Log</span>
+<div class="flex gap-base">
+<div class="w-2.5 h-2.5 rounded-full bg-red-500/20"></div>
+<div class="w-2.5 h-2.5 rounded-full bg-yellow-500/20"></div>
+<div class="w-2.5 h-2.5 rounded-full bg-green-500/20"></div>
+</div>
+</div>
+<div class="p-md h-48 overflow-y-auto terminal-scroll font-label-mono text-[12px] leading-relaxed text-on-surface-variant">
+<p class="text-secondary/80">[14:22:01] VERDICT_CORE: Initiating multi-agent orchestration for NVDA.</p>
+<p>[14:22:04] RESEARCH_AGENT: Successfully indexed SEC EDGAR filings for fiscal year 2023.</p>
+<p>[14:22:08] FINANCIAL_AGENT: Revenue CAGR confirmed at 42.1%.</p>
+<p>[14:22:15] RESEARCH_AGENT: Competitive landscape mapping complete. Moat: High.</p>
+<p>[14:23:44] SENTIMENT_AGENT: Analyzing Q3 Earnings Call Q&amp;A tone...</p>
+<p class="text-primary animate-pulse">[14:23:55] SENTIMENT_AGENT: Detected uptick in "bullish" vernacular across 12 institutional reports.</p>
+<p>[14:24:02] SENTIMENT_AGENT: Processing cross-border social velocity on Blackwell architecture leaks...</p>
+<div class="w-1 h-4 bg-secondary mt-1 animate-pulse inline-block"></div>
+</div>
+</footer>
+</main>
+<!-- Right Insights Panel -->
+<aside class="fixed right-0 top-16 h-[calc(100vh-64px)] w-80 bg-surface border-l border-white/5 p-md z-40 overflow-y-auto">
+<div class="mb-lg">
+<div class="flex items-center justify-between mb-sm">
+<h2 class="text-headline-sm font-headline-sm text-primary">Company Snapshot</h2>
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer">info</span>
+</div>
+<div class="glass-card rounded-xl p-sm mb-md overflow-hidden relative">
+
+<div class="relative z-10">
+<div class="flex items-center gap-sm mb-xs">
+<img class="w-12 h-12 rounded-lg bg-surface border border-white/10 p-2" data-alt="NVIDIA corporate logo, clean minimalist vector art in a dark mode style. The iconic green swirl is stylized with glowing neon lines on a deep black background, conveying high-tech innovation and semiconductor leadership. The aesthetic matches the dark graphite enterprise theme of the dashboard." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDkBXmRdjPpCtnDBkUPjydtJ-yTp95A4C0CPnbZf-fW_5iFaGPf6Rus7T39MngDM_f_DnsBJBrdOq-UuwEO_jDIZuU97_SMIKaTRspaBk_mTalm18stZW6g5HC5uc7a6BUVzk40m2nZIdj7PHufvukvF-vQVPm4BAbiO7HkPLJJiXmEJlPPEIpK3yymluDzBH1HdaV-t8aimbZ29SF_fBvqdwTdxoRk6Zctane1uDJ1UWNQo06qnF5wPAmqjmOo3t6OJYJb6-tJ_uA"/>
+<div>
+<div class="text-display-lg font-display-lg leading-none">NVDA</div>
+<div class="text-label-mono text-on-surface-variant">NASDAQ</div>
+</div>
+</div>
+<div class="text-body-md text-on-surface-variant font-body-md">NVIDIA Corporation</div>
+</div>
+</div>
+</div>
+<div class="space-y-md">
+<div class="flex flex-col gap-xs">
+<label class="text-label-mono text-on-surface-variant uppercase text-[10px]">Industry</label>
+<div class="text-body-lg font-body-lg text-primary">Semiconductors &amp; GPU Systems</div>
+</div>
+<div class="grid grid-cols-2 gap-sm">
+<div class="glass-card rounded-lg p-sm">
+<label class="text-label-mono text-on-surface-variant uppercase text-[10px]">Market Cap</label>
+<div class="text-body-md font-bold text-primary">$3.15T</div>
+</div>
+<div class="glass-card rounded-lg p-sm">
+<label class="text-label-mono text-on-surface-variant uppercase text-[10px]">P/E Ratio</label>
+<div class="text-body-md font-bold text-primary">72.4x</div>
+</div>
+<div class="glass-card rounded-lg p-sm">
+<label class="text-label-mono text-on-surface-variant uppercase text-[10px]">24h Change</label>
+<div class="text-body-md font-bold text-secondary">+2.45%</div>
+</div>
+<div class="glass-card rounded-lg p-sm">
+<label class="text-label-mono text-on-surface-variant uppercase text-[10px]">Volatility</label>
+<div class="text-body-md font-bold text-on-surface">Med-High</div>
+</div>
+</div>
+<div class="border-t border-white/5 pt-md">
+<h3 class="font-label-mono text-label-mono text-on-surface-variant mb-sm uppercase">Quick Insights</h3>
+<ul class="space-y-sm">
+<li class="flex gap-sm">
+<span class="material-symbols-outlined text-secondary text-[18px]">trending_up</span>
+<p class="text-body-md text-on-surface-variant leading-snug">Dominant market share (80%+) in AI data center accelerators.</p>
+</li>
+<li class="flex gap-sm">
+<span class="material-symbols-outlined text-secondary text-[18px]">verified</span>
+<p class="text-body-md text-on-surface-variant leading-snug">Blackwell architecture seeing unprecedented pre-order volume.</p>
+</li>
+<li class="flex gap-sm">
+<span class="material-symbols-outlined text-error text-[18px]">priority_high</span>
+<p class="text-body-md text-on-surface-variant leading-snug">Geopolitical risks regarding TSM supply chain remain key concern.</p>
+</li>
+</ul>
+</div>
+<button class="w-full py-sm rounded-lg border border-white/10 text-on-surface-variant font-medium hover:bg-white/5 transition-colors text-body-md">
+                    View Full Company Profile
+                </button>
+</div>
+</aside>
+</div>
+<!-- Background Atmospheric Effect -->
+<div class="fixed inset-0 pointer-events-none z-[-1] overflow-hidden">
+<div class="absolute top-[-10%] right-[-10%] w-[50%] h-[50%] bg-secondary/5 rounded-full blur-[120px]"></div>
+<div class="absolute bottom-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/5 rounded-full blur-[100px]"></div>
+</div>
+<script>
+        // Simple micro-interaction for the log scrolling
+        const logContainer = document.querySelector('.terminal-scroll');
+        setInterval(() => {
+            if (logContainer) {
+                logContainer.scrollTop = logContainer.scrollHeight;
+            }
+        }, 5000);
+
+        // Simulate agent progress movement
+        const progressBar = document.querySelector('.w-\\[65\\%\\]');
+        let width = 65;
+        setInterval(() => {
+            if (width < 98) {
+                width += Math.random() * 0.5;
+                if (progressBar) progressBar.style.width = width + '%';
+            }
+        }, 3000);
+    </script>
+</body></html>
