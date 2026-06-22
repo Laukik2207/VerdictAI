@@ -9,6 +9,7 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        indigo: '#3B82F6',
         brand: {
           surface: 'var(--color-surface)',
           'surface-dim': 'var(--color-surface-dim)',
@@ -85,7 +86,16 @@ const config: Config = {
         xl: '64px',
         gutter: '24px',
         'margin-safe': '32px',
-      }
+      },
+      keyframes: {
+        shimmer: {
+          '0%': { backgroundPosition: '200% 0' },
+          '100%': { backgroundPosition: '-200% 0' },
+        },
+      },
+      animation: {
+        shimmer: 'shimmer 2s linear infinite',
+      },
     },
   },
   plugins: [],

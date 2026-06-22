@@ -1,6 +1,12 @@
 export type AgentStatus = "idle" | "running" | "done" | "error";
 
 export interface ResearchOutput {
+  sector: string;
+  hq: string;
+  founded: string;
+  businessModel: string;
+  revenueModel: string[];
+  metrics: { label: string; value: string | number }[];
   summary: string;
   keyPoints: string[];
   sources: string[];
@@ -19,6 +25,11 @@ export interface SentimentOutput {
 }
 
 export interface RiskOutput {
+  competitionRisk: string;
+  operationalRisk: string;
+  marketRisk: string;
+  missingInfo: string[];
+  score: number; // 0 to 100 or something similar
   level: "LOW" | "MEDIUM" | "HIGH";
   factors: string[];
   mitigations: string[];
@@ -27,10 +38,16 @@ export interface RiskOutput {
 export interface VerdictOutput {
   decision: "invest" | "pass";
   rationale: string;
-  confidence: number; // 0 to 1
+  confidence: number; // 0 to 100
+  thesis: string;
+  reasoning: string[];
+  assumptions: string[];
 }
 
 export interface ChallengeOutput {
+  counterVerdict: string;
+  weakestAssumption: string;
+  alternativeThesis: string;
   counterArguments: string[];
   weaknesses: string[];
   finalAdjustments: string;
