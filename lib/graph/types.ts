@@ -63,6 +63,7 @@ export interface GraphState {
   challenge?: ChallengeOutput;
   status: AgentStatus;
   error?: string;
+  errors?: string[];
 }
 
 export type SSEEventType = "agent_start" | "agent_done" | "agent_error" | "complete" | "error";

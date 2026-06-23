@@ -13,76 +13,9 @@ import {
 import { runResearchAgent } from "../agents/researchAgent";
 import { runFinancialAgent } from "../agents/financialAgent";
 import { runSentimentAgent } from "../agents/sentimentAgent";
-
-// --- Mock Data (for remaining stubs) ---
-const MOCK_RESEARCH_OUTPUT: ResearchOutput = {
-  sector: "Technology",
-  hq: "Santa Clara, CA",
-  founded: "1993",
-  businessModel: "Designs and manufactures advanced GPUs and semiconductor products.",
-  revenueModel: ["Hardware Sales", "Datacenter Licensing", "Software Subscriptions"],
-  metrics: [
-    { label: "Market Cap", value: "$2.2T" },
-    { label: "P/E Ratio", value: "72.4" },
-    { label: "Rev Growth", value: "265% YoY" },
-    { label: "Gross Margin", value: "76.0%" },
-  ],
-  summary: "NVIDIA dominates the AI hardware accelerator market.",
-  keyPoints: ["Monopoly in training hardware", "CUDA software moat", "Supply chain risks"],
-  sources: ["SEC 10-K", "Q4 Earnings Transcript"],
-};
-
-const MOCK_FINANCIAL_OUTPUT: FinancialOutput = {
-  metrics: { Revenue: "$60.9B", NetIncome: "$29.7B", FCF: "$26.9B" },
-  trend: "positive",
-  analysis: "Exceptional margin expansion driven by H100 mix.",
-};
-
-const MOCK_SENTIMENT_OUTPUT: SentimentOutput = {
-  score: 95,
-  label: "bullish",
-  details: "Unanimous buy ratings from tier-1 banks following GTC.",
-};
-
-const MOCK_RISK_OUTPUT: RiskOutput = {
-  competitionRisk: "AMD's MI300 and internal hyperscaler silicon (TPU, Trainium) are capturing some low-end inference workloads.",
-  operationalRisk: "Highly dependent on TSMC in Taiwan for 100% of leading-edge node manufacturing.",
-  marketRisk: "Overall tech sector rotation or a 'AI winter' macro event could compress the multiple significantly.",
-  missingInfo: ["Exact B100 yield rates", "China export restriction financial impact estimates for next FY"],
-  score: 65,
-  level: "MEDIUM",
-  factors: ["Geopolitics", "Valuation"],
-  mitigations: ["Diversifying assembly to US/Europe", "Aggressive product roadmap"],
-};
-
-const MOCK_VERDICT_OUTPUT: VerdictOutput = {
-  decision: "invest",
-  rationale: "Unprecedented demand for AI infrastructure with an unassailable software moat.",
-  confidence: 92,
-  thesis: "NVDA remains a multi-year compounding play on global AI capex spend.",
-  reasoning: [
-    "Hyperscalers have committed $100B+ to datacenter buildouts over the next 24 months.",
-    "No viable near-term competitor to CUDA architecture in the developer ecosystem.",
-    "Gross margins expanding due to pricing power on H100/B100 chips."
-  ],
-  assumptions: [
-    "AI adoption continues to scale linearly or exponentially.",
-    "TSMC can meet wafer demand without geopolitical interruption."
-  ],
-};
-
-const MOCK_CHALLENGE_OUTPUT: ChallengeOutput = {
-  counterVerdict: "The AI hardware bubble is pricing in perfection, making any earnings miss catastrophic.",
-  weakestAssumption: "Hyperscalers will continue to spend infinitely on GPUs before seeing software ROI.",
-  alternativeThesis: "Once the initial training cluster buildout is complete, demand shifts to cheaper inference chips where NVDA has lower margins and higher competition.",
-  counterArguments: [
-    "Revenue growth will inevitably decelerate by FY26 due to the law of large numbers.",
-    "Customer concentration is extremely high (top 4 customers = 40% revenue).",
-    "Geopolitical tension in Taiwan represents an un-hedgable existential risk."
-  ],
-  weaknesses: ["Valuation risk"],
-  finalAdjustments: "Reduced confidence by 5%",
-};
+import { runRiskAgent } from "../agents/riskAgent";
+import { runJudgeAgent } from "../agents/judgeAgent";
+import { runChallengeAgent } from "../agents/challengeAgent";
 
 // --- Graph State Definition ---
 export const GraphStateAnnotation = Annotation.Root({
@@ -115,36 +48,49 @@ export const GraphStateAnnotation = Annotation.Root({
   error: Annotation<string>({
     reducer: (x, y) => y ?? x,
   }),
+  errors: Annotation<string[]>({
+    reducer: (x, y) => (y ? x.concat(y) : x),
+    default: () => [],
+  }),
 });
 
 // --- Nodes ---
 async function researchNode(state: typeof GraphStateAnnotation.State): Promise<Partial<GraphState>> {
   const output = await runResearchAgent(state.query);
-  return { research: output };
+  const errors = (output as any).error ? [(output as any).error] : undefined;
+  return { research: output, errors };
 }
 
 async function financialNode(state: typeof GraphStateAnnotation.State): Promise<Partial<GraphState>> {
   if (!state.research) throw new Error("Research state missing before Financial node.");
   const output = await runFinancialAgent(state.research);
-  return { financial: output };
+  const errors = (output as any).error ? [(output as any).error] : undefined;
+  return { financial: output, errors };
 }
 
 async function sentimentNode(state: typeof GraphStateAnnotation.State): Promise<Partial<GraphState>> {
   if (!state.research) throw new Error("Research state missing before Sentiment node.");
   const output = await runSentimentAgent(state.query, state.research);
-  return { sentiment: output };
+  const errors = (output as any).error ? [(output as any).error] : undefined;
+  return { sentiment: output, errors };
 }
 
 async function riskNode(state: typeof GraphStateAnnotation.State): Promise<Partial<GraphState>> {
-  return { risk: MOCK_RISK_OUTPUT };
+  const output = await runRiskAgent(state);
+  const errors = (output as any).error ? [(output as any).error] : undefined;
+  return { risk: output, errors };
 }
 
 async function judgeNode(state: typeof GraphStateAnnotation.State): Promise<Partial<GraphState>> {
-  return { verdict: MOCK_VERDICT_OUTPUT };
+  const output = await runJudgeAgent(state);
+  const errors = (output as any).error ? [(output as any).error] : undefined;
+  return { verdict: output, errors };
 }
 
 async function challengeNode(state: typeof GraphStateAnnotation.State): Promise<Partial<GraphState>> {
-  return { challenge: MOCK_CHALLENGE_OUTPUT };
+  const output = await runChallengeAgent(state);
+  const errors = (output as any).error ? [(output as any).error] : undefined;
+  return { challenge: output, errors };
 }
 
 // --- Graph Builder ---
