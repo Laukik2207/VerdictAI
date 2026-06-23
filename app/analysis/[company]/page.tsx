@@ -1,12 +1,13 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useAnalysis, AGENT_ORDER } from "@/hooks/useAnalysis";
 import { ExecutionTimeline } from "@/components/ExecutionTimeline";
 import { AgentCard } from "@/components/AgentCard";
+import { AnalysisReport } from "@/components/AnalysisReport";
 import { Button } from "@/components/ui/Button";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Activity } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 
 export default function AnalysisPage() {
@@ -27,6 +28,8 @@ export default function AnalysisPage() {
     error,
   } = useAnalysis(company, isMock);
 
+  const [showTimelineModal, setShowTimelineModal] = useState(false);
+
   if (error) {
     return (
       <div className="min-h-screen bg-brand-background flex items-center justify-center p-4">
@@ -45,98 +48,112 @@ export default function AnalysisPage() {
   }
 
   return (
-    <div className="min-h-screen bg-brand-background text-brand-on-background">
+    <div className="min-h-screen bg-brand-background text-brand-on-background relative">
       {/* Top Nav */}
-      <nav className="fixed top-0 left-0 w-full h-16 border-b border-white/5 bg-brand-background/80 backdrop-blur-xl z-50 flex items-center px-4 md:px-8">
+      <nav className="fixed top-0 left-0 w-full h-16 border-b border-white/5 bg-brand-background/80 backdrop-blur-xl z-50 flex items-center justify-between px-4 md:px-8">
         <button
           onClick={() => router.push("/")}
           className="flex items-center space-x-2 text-sm text-brand-on-surface-variant hover:text-white transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
-          <span>Back</span>
+          <span>Search</span>
         </button>
+        
+        {isComplete && (
+          <button 
+            onClick={() => setShowTimelineModal(!showTimelineModal)}
+            className="flex items-center gap-2 text-sm font-mono text-indigo hover:text-white transition-colors"
+          >
+            <Activity className="w-4 h-4" />
+            <span>View Timeline</span>
+          </button>
+        )}
       </nav>
 
-      <main className="pt-24 pb-12 px-4 md:px-8 max-w-7xl mx-auto h-full min-h-screen flex flex-col">
-        {/* Header */}
-        <header className="mb-12">
-          <h1 className="text-3xl md:text-5xl font-display font-medium text-white tracking-tight mb-2">
-            {company}
-          </h1>
-          <p className="text-sm font-mono text-brand-outline uppercase tracking-wider">
-            {isComplete ? "Analysis complete" : "Analysis in progress..."}
-          </p>
-        </header>
+      <main className="pt-24 pb-12 px-4 md:px-8 w-full max-w-7xl mx-auto min-h-screen flex flex-col">
+        
+        {!isComplete ? (
+          <>
+            <header className="mb-12">
+              <h1 className="text-3xl md:text-5xl font-display font-medium text-white tracking-tight mb-2">
+                {company}
+              </h1>
+              <p className="text-sm font-mono text-brand-outline uppercase tracking-wider animate-pulse">
+                Analysis in progress...
+              </p>
+            </header>
 
-        {/* Split Layout */}
-        <div className="flex-1 flex flex-col md:flex-row gap-12 relative">
-          
-          {/* Left: Timeline (40%) */}
-          <div className="w-full md:w-[40%] flex-shrink-0">
-            <div className="sticky top-28">
-              <ExecutionTimeline
-                agentStatuses={agentStatuses}
-                agentOutputs={agentOutputs}
-                elapsedMs={elapsedMs}
-                company={company}
-              />
-            </div>
-          </div>
-
-          {/* Right: Content (60%) */}
-          <div className="w-full md:w-[60%] flex-1 relative">
-            {/* During execution: Agent Cards */}
-            <div 
-              className={cn(
-                "w-full space-y-4 transition-all duration-700 ease-in-out absolute inset-0 top-0 left-0",
-                isComplete ? "opacity-0 pointer-events-none scale-95" : "opacity-100 scale-100"
-              )}
-            >
-              {AGENT_ORDER.map(agentName => {
-                const status = agentStatuses[agentName];
-                if (status === "idle") return null;
-
-                // Grab corresponding output
-                let output = undefined;
-                if (agentName === "ResearchAgent") output = agentOutputs.research;
-                if (agentName === "FinancialAgent") output = agentOutputs.financial;
-                if (agentName === "SentimentAgent") output = agentOutputs.sentiment;
-                if (agentName === "RiskAgent") output = agentOutputs.risk;
-                if (agentName === "JudgeAgent") output = agentOutputs.verdict;
-                if (agentName === "ChallengeAgent") output = agentOutputs.challenge;
-
-                return (
-                  <AgentCard
-                    key={agentName}
-                    agentName={agentName}
-                    status={status}
-                    elapsedMs={elapsedMs[agentName]}
-                    output={output}
+            {/* Split Layout for Execution */}
+            <div className="flex-1 flex flex-col md:flex-row gap-12">
+              {/* Left: Timeline */}
+              <div className="w-full md:w-[40%] flex-shrink-0">
+                <div className="sticky top-28">
+                  <ExecutionTimeline
+                    agentStatuses={agentStatuses}
+                    agentOutputs={agentOutputs}
+                    elapsedMs={elapsedMs}
+                    company={company}
                   />
-                );
-              })}
-            </div>
-
-            {/* Complete: Report Placeholder */}
-            <div
-              className={cn(
-                "w-full bg-brand-surface-container-low border border-white/10 rounded-xl p-8 flex items-center justify-center min-h-[400px] transition-all duration-700 delay-300 ease-in-out absolute inset-0 top-0 left-0",
-                !isComplete ? "opacity-0 pointer-events-none scale-105" : "opacity-100 scale-100"
-              )}
-            >
-              <div className="text-center space-y-4">
-                <div className="w-16 h-16 mx-auto rounded-full bg-verdict-invest/10 flex items-center justify-center">
-                  <span className="text-verdict-invest text-2xl">✓</span>
                 </div>
-                <h3 className="text-xl font-medium text-white">Report Generated</h3>
-                <p className="text-brand-on-surface-variant text-sm max-w-sm mx-auto">
-                  Report component comes in Phase 5. The analysis has successfully concluded.
-                </p>
+              </div>
+
+              {/* Right: Agent Cards */}
+              <div className="w-full md:w-[60%] flex-1 space-y-4">
+                {AGENT_ORDER.map((agentName) => {
+                  const status = agentStatuses[agentName];
+                  if (status === "idle") return null;
+
+                  let output = undefined;
+                  if (agentName === "ResearchAgent") output = agentOutputs.research;
+                  if (agentName === "FinancialAgent") output = agentOutputs.financial;
+                  if (agentName === "SentimentAgent") output = agentOutputs.sentiment;
+                  if (agentName === "RiskAgent") output = agentOutputs.risk;
+                  if (agentName === "JudgeAgent") output = agentOutputs.verdict;
+                  if (agentName === "ChallengeAgent") output = agentOutputs.challenge;
+
+                  return (
+                    <AgentCard
+                      key={agentName}
+                      agentName={agentName}
+                      status={status}
+                      elapsedMs={elapsedMs[agentName]}
+                      output={output}
+                    />
+                  );
+                })}
               </div>
             </div>
+          </>
+        ) : (
+          /* Report View (Centered) */
+          <div className="w-full flex justify-center animate-in fade-in zoom-in-95 duration-500 ease-out">
+            {report && <AnalysisReport report={report} company={company} />}
+          </div>
+        )}
+      </main>
+
+      {/* Timeline Modal / Flyout when Report is Complete */}
+      {isComplete && showTimelineModal && (
+        <div className="fixed inset-0 z-50 flex items-start justify-end bg-black/40 backdrop-blur-sm transition-opacity">
+          <div className="w-full md:w-[400px] h-full bg-brand-surface-container-highest border-l border-white/10 p-6 overflow-y-auto shadow-2xl animate-in slide-in-from-right-8 duration-300">
+            <div className="flex items-center justify-between mb-8">
+              <h3 className="font-headline text-lg text-white">Execution Timeline</h3>
+              <button 
+                onClick={() => setShowTimelineModal(false)}
+                className="text-brand-on-surface-variant hover:text-white p-2"
+              >
+                Close
+              </button>
+            </div>
+            <ExecutionTimeline
+              agentStatuses={agentStatuses}
+              agentOutputs={agentOutputs}
+              elapsedMs={elapsedMs}
+              company={company}
+            />
           </div>
         </div>
-      </main>
+      )}
     </div>
   );
 }
