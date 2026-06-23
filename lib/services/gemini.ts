@@ -1,7 +1,14 @@
-import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
+import { ChatOpenAI } from "@langchain/openai";
 
-// Flash chosen for latency; upgrade to Pro for higher reasoning depth
-export const llm = new ChatGoogleGenerativeAI({
-  model: "gemini-1.5-flash",
+export const llm = new ChatOpenAI({
+  modelName: "openai/gpt-4o-mini",
   temperature: 0.3,
+  apiKey: process.env.OPENROUTER_API_KEY,
+  configuration: {
+    baseURL: "https://openrouter.ai/api/v1",
+    defaultHeaders: {
+      "HTTP-Referer": "http://localhost:3000",
+      "X-Title": "VerdictAI",
+    },
+  },
 });

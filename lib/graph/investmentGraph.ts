@@ -10,7 +10,11 @@ import {
   ChallengeOutput 
 } from "./types";
 
-// --- Mock Data ---
+import { runResearchAgent } from "../agents/researchAgent";
+import { runFinancialAgent } from "../agents/financialAgent";
+import { runSentimentAgent } from "../agents/sentimentAgent";
+
+// --- Mock Data (for remaining stubs) ---
 const MOCK_RESEARCH_OUTPUT: ResearchOutput = {
   sector: "Technology",
   hq: "Santa Clara, CA",
@@ -113,17 +117,22 @@ export const GraphStateAnnotation = Annotation.Root({
   }),
 });
 
-// --- Stub Nodes ---
+// --- Nodes ---
 async function researchNode(state: typeof GraphStateAnnotation.State): Promise<Partial<GraphState>> {
-  return { research: MOCK_RESEARCH_OUTPUT };
+  const output = await runResearchAgent(state.query);
+  return { research: output };
 }
 
 async function financialNode(state: typeof GraphStateAnnotation.State): Promise<Partial<GraphState>> {
-  return { financial: MOCK_FINANCIAL_OUTPUT };
+  if (!state.research) throw new Error("Research state missing before Financial node.");
+  const output = await runFinancialAgent(state.research);
+  return { financial: output };
 }
 
 async function sentimentNode(state: typeof GraphStateAnnotation.State): Promise<Partial<GraphState>> {
-  return { sentiment: MOCK_SENTIMENT_OUTPUT };
+  if (!state.research) throw new Error("Research state missing before Sentiment node.");
+  const output = await runSentimentAgent(state.query, state.research);
+  return { sentiment: output };
 }
 
 async function riskNode(state: typeof GraphStateAnnotation.State): Promise<Partial<GraphState>> {
