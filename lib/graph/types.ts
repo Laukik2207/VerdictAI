@@ -71,3 +71,11 @@ export interface SSEEvent {
   type: SSEEventType;
   data: any;
 }
+
+export type AgentName = 
+  | "ResearchAgent" 
+  | "FinancialAgent" 
+  | "SentimentAgent" 
+  | "RiskAgent" 
+  | "JudgeAgent" 
+  | "ChallengeAgent";
