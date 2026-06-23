@@ -17,7 +17,6 @@ export default function AnalysisPage() {
 
   const companyRaw = Array.isArray(params.company) ? params.company[0] : params.company;
   const company = decodeURIComponent(companyRaw || "");
-  const isMock = searchParams?.get("mock") === "true";
 
   const {
     agentStatuses,
@@ -26,7 +25,7 @@ export default function AnalysisPage() {
     report,
     isComplete,
     error,
-  } = useAnalysis(company, isMock);
+  } = useAnalysis(company);
 
   const [showTimelineModal, setShowTimelineModal] = useState(false);
 

@@ -99,7 +99,9 @@ const MOCK_REPORT: GraphState = {
   challenge: mockChallenge,
 };
 
-export function useAnalysis(company: string, isMock: boolean = false) {
+export function useAnalysis(company: string) {
+  const isMock = process.env.NODE_ENV === "test";
+
   const [agentStatuses, setAgentStatuses] = useState<Record<AgentName, AgentStatus>>({
     ResearchAgent: "idle",
     FinancialAgent: "idle",
@@ -142,19 +144,17 @@ export function useAnalysis(company: string, isMock: boolean = false) {
     const timeouts: NodeJS.Timeout[] = [];
 
     timeline.forEach((step) => {
-      // Start event
       timeouts.push(
         setTimeout(() => {
-          setAgentStatuses(prev => ({ ...prev, [step.name]: "running" }));
+          setAgentStatuses(prev => ({ ...prev, [step.name as AgentName]: "running" }));
         }, step.start)
       );
 
-      // Done event
       timeouts.push(
         setTimeout(() => {
-          setAgentStatuses(prev => ({ ...prev, [step.name]: "done" }));
+          setAgentStatuses(prev => ({ ...prev, [step.name as AgentName]: "done" }));
           setAgentOutputs(prev => ({ ...prev, [step.outputKey]: step.outputData }));
-          setElapsedMs(prev => ({ ...prev, [step.name]: step.end - step.start }));
+          setElapsedMs(prev => ({ ...prev, [step.name as AgentName]: step.end - step.start }));
         }, step.end)
       );
     });
@@ -170,19 +170,47 @@ export function useAnalysis(company: string, isMock: boolean = false) {
   }, [company]);
 
   const startRealTimeline = useCallback(() => {
-    // Real implementation for Phase 9 using fetch() and ReadableStream
-    // For now, if called, we just throw or do nothing until Phase 9.
     const abortController = new AbortController();
-    
+    let timeoutId: NodeJS.Timeout | null = null;
+
+    const resetTimeout = () => {
+      if (timeoutId) clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        setError("Connection timed out. Analysis took too long.");
+        abortController.abort();
+      }, 65000); // 65 seconds
+    };
+
     const run = async () => {
+      // Reset state
+      setAgentStatuses({
+        ResearchAgent: "idle",
+        FinancialAgent: "idle",
+        SentimentAgent: "idle",
+        RiskAgent: "idle",
+        JudgeAgent: "idle",
+        ChallengeAgent: "idle",
+      });
+      setAgentOutputs({});
+      setElapsedMs({} as any);
+      setReport(null);
+      setIsComplete(false);
+      setError(null);
+
+      resetTimeout();
+
       try {
         const res = await fetch("/api/analyze", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ query: company }),
+          body: JSON.stringify({ company }),
           signal: abortController.signal,
         });
 
+        if (!res.ok) {
+           const errData = await res.json().catch(() => ({}));
+           throw new Error(errData.error || `HTTP ${res.status}`);
+        }
         if (!res.body) throw new Error("No response body");
 
         const reader = res.body.getReader();
@@ -198,17 +226,43 @@ export function useAnalysis(company: string, isMock: boolean = false) {
           buffer = lines.pop() || "";
 
           for (const line of lines) {
-            if (line.startsWith("event: ")) {
-               // handle event type
-            } else if (line.startsWith("data: ")) {
+            if (line.startsWith("data: ")) {
+              resetTimeout(); // Reset connection timeout on every event
               const dataStr = line.substring(6);
               try {
-                const event: SSEEvent = JSON.parse(dataStr);
-                // Implementation will go here in Phase 9
-                // On agent_start: set running, mark start time
-                // On agent_done: set done, calc elapsedMs, store output
-                // On agent_error: set error
-                // On complete: set isComplete, store report
+                const eventPayload = JSON.parse(dataStr);
+                const eventName = eventPayload.event;
+                const agent = eventPayload.agent as AgentName;
+
+                if (eventName === "agent_start") {
+                  setAgentStatuses((prev) => ({ ...prev, [agent]: "running" }));
+                } else if (eventName === "agent_done") {
+                  setAgentStatuses((prev) => ({ ...prev, [agent]: "done" }));
+                  setElapsedMs((prev) => ({ ...prev, [agent]: eventPayload.elapsedMs }));
+                  
+                  // Map agent to the output key
+                  let outputKey = "";
+                  if (agent === "ResearchAgent") outputKey = "research";
+                  if (agent === "FinancialAgent") outputKey = "financial";
+                  if (agent === "SentimentAgent") outputKey = "sentiment";
+                  if (agent === "RiskAgent") outputKey = "risk";
+                  if (agent === "JudgeAgent") outputKey = "verdict";
+                  if (agent === "ChallengeAgent") outputKey = "challenge";
+
+                  if (outputKey) {
+                    setAgentOutputs((prev) => ({ ...prev, [outputKey]: eventPayload.output }));
+                  }
+                } else if (eventName === "agent_error") {
+                  setAgentStatuses((prev) => ({ ...prev, [agent]: "error" }));
+                } else if (eventName === "complete") {
+                  setIsComplete(true);
+                  setReport(eventPayload.report);
+                  if (timeoutId) clearTimeout(timeoutId);
+                } else if (eventName === "error") {
+                  setError(eventPayload.message || "Fatal pipeline error");
+                  if (timeoutId) clearTimeout(timeoutId);
+                  abortController.abort();
+                }
               } catch (e) {
                 console.error("Failed to parse SSE data", e);
               }
@@ -219,12 +273,17 @@ export function useAnalysis(company: string, isMock: boolean = false) {
         if (err.name !== "AbortError") {
           setError(err.message || "An error occurred during analysis.");
         }
+      } finally {
+        if (timeoutId) clearTimeout(timeoutId);
       }
     };
 
     run();
 
-    return () => abortController.abort();
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId);
+      abortController.abort();
+    };
   }, [company]);
 
   useEffect(() => {
