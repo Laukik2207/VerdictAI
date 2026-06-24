@@ -33,30 +33,53 @@ export function ResearchView({ agentStatuses, agentOutputs, logEntries, company 
   }, [logEntries]);
 
   const renderStepIcon = (agentId: string, label: string, Icon: any) => {
-    const status = agentStatuses[agentId as AgentName] || "idle";
-    const isComplete = status === "done";
-    const isCurrent = status === "running";
+    let status = agentStatuses[agentId as AgentName] || "idle";
+    let isComplete = status === "done";
+    let isCurrent = status === "running";
+
+    if (label === "VERDICT") {
+      const judgeStatus = agentStatuses.JudgeAgent || "idle";
+      const challengeStatus = agentStatuses.ChallengeAgent || "idle";
+      isComplete = judgeStatus === "done" && challengeStatus === "done";
+      isCurrent = judgeStatus === "running" || challengeStatus === "running";
+      if (!isComplete && !isCurrent) {
+        status = "idle";
+      }
+    }
     
     return (
-      <div key={agentId} className="flex flex-col items-center gap-3">
+      <div key={label} className="flex flex-col items-center gap-3">
         <div className="relative">
           {/* Pulsing ring for current step */}
           {isCurrent && (
-            <div className="absolute inset-0 rounded-full border border-accent animate-ping opacity-75"></div>
+            <div className="absolute inset-0 rounded-full border-[2px] border-[#00D4A0] animate-[pingRing_1.5s_ease-out_infinite]" style={{
+              animationName: 'pingRing',
+              animationDuration: '1.5s',
+              animationTimingFunction: 'ease-out',
+              animationIterationCount: 'infinite'
+            }}>
+              <style dangerouslySetInnerHTML={{__html: `
+                @keyframes pingRing {
+                  0% { box-shadow: 0 0 0 0 rgba(0,212,160,0.4); }
+                  70% { box-shadow: 0 0 0 8px rgba(0,212,160,0); }
+                  100% { box-shadow: 0 0 0 0 rgba(0,212,160,0); }
+                }
+              `}} />
+            </div>
           )}
           <div className={cn(
             "w-10 h-10 rounded-full flex items-center justify-center relative z-10 transition-colors duration-500",
-            (isComplete || isCurrent) ? "bg-accent" : "bg-bg-card-hover"
+            isComplete ? "bg-[#00D4A0]" : isCurrent ? "bg-[#00D4A0]" : "bg-[#1a1a1a]"
           )}>
             <Icon className={cn(
               "w-5 h-5 transition-colors duration-500",
-              (isComplete || isCurrent) ? "text-black" : "text-text-muted"
+              (isComplete || isCurrent) ? "text-black" : "text-[#444]"
             )} />
           </div>
         </div>
         <span className={cn(
           "text-[10px] font-medium tracking-wider uppercase transition-colors duration-500",
-          (isComplete || isCurrent) ? "text-accent" : "text-text-muted"
+          (isComplete || isCurrent) ? "text-[#00D4A0]" : "text-[#444]"
         )}>
           {label}
         </span>
@@ -96,20 +119,21 @@ export function ResearchView({ agentStatuses, agentOutputs, logEntries, company 
           </div>
         </div>
 
-        {/* Progress Bar */}
-        <div className="h-[3px] w-full bg-bg-card-hover rounded-full overflow-hidden mb-4 relative">
-          {status === "done" && (
-            <div className="h-full bg-accent w-full transition-all duration-500" />
-          )}
-          {status === "running" && (
-            <div className="h-full bg-accent/30 w-[60%] relative overflow-hidden transition-all duration-500">
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-accent to-transparent animate-[shimmer_1.5s_infinite] -translate-x-full" />
-            </div>
-          )}
+        {/* Progress bar — 3px height, full width */}
+        <div className="w-full h-[3px] bg-[#1a1a1a] rounded-full mt-3 mb-3">
+          <div
+            className={cn(
+              "h-full rounded-full transition-all duration-500",
+              status === 'done' && "w-full bg-[#00D4A0]",
+              status === 'running' && "w-[55%] bg-[#00D4A0] animate-pulse",
+              status === 'error' && "w-full bg-red-500",
+              status === 'idle' && "w-0"
+            )}
+          />
         </div>
 
         <div className="mt-auto">
-          <p className="font-mono italic text-[12px] text-text-secondary">
+          <p className="font-mono text-[12px] italic text-[#666]">
             {statusText}
           </p>
         </div>
@@ -155,7 +179,8 @@ export function ResearchView({ agentStatuses, agentOutputs, logEntries, company 
           <span className="text-[10px] font-medium text-text-muted uppercase tracking-widest">
             LIVE EXECUTION LOG
           </span>
-          <div className="flex gap-1.5">
+          <div className="flex gap-1.5 items-center">
+            <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
             <div className="w-2.5 h-2.5 rounded-full bg-status-fail/80" />
             <div className="w-2.5 h-2.5 rounded-full bg-status-warn/80" />
             <div className="w-2.5 h-2.5 rounded-full bg-status-pass/80" />
@@ -165,14 +190,20 @@ export function ResearchView({ agentStatuses, agentOutputs, logEntries, company 
           ref={scrollRef}
           className="flex-1 p-4 overflow-y-auto font-mono text-[12px] space-y-2 scroll-smooth"
         >
-          {logEntries.slice(-20).map((log) => (
-            <div key={log.id} className="flex gap-2">
-              <span className="text-[#555555] whitespace-nowrap">{log.timestamp}</span>
-              <span className={cn(log.bold ? "text-accent font-bold" : "text-[#888888]")}>
-                {log.text}
-              </span>
-            </div>
-          ))}
+          {logEntries.slice(-20).map((log) => {
+            const isBold = /COMPLETE|DETECTED|CALIBRATED|CONFIRMED|VERDICT|ERROR/i.test(log.text);
+            return (
+              <div key={log.id} className="flex gap-2">
+                <span className="text-[#555555] whitespace-nowrap">{log.timestamp}</span>
+                <span className={cn(
+                  "font-mono text-xs",
+                  isBold ? 'text-[#00D4A0] font-semibold' : 'text-[#666]'
+                )}>
+                  {log.text}
+                </span>
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>

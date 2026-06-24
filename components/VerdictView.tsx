@@ -2,7 +2,8 @@ import React, { useEffect } from "react";
 import { GraphState } from "@/lib/graph/types";
 import { SentimentChart } from "./SentimentChart";
 import { generatePillarLabel } from "@/lib/utils/thesisLabels";
-import { Download, FileText, BarChart3, Globe, Activity, TrendingDown, TrendingUp } from "lucide-react";
+import { formatCompanyName } from "@/lib/utils/formatCompany";
+import { Download, FileText, BarChart3, Globe, Activity, TrendingDown, TrendingUp, BookOpen } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 
 interface VerdictViewProps {
@@ -26,8 +27,8 @@ export function VerdictView({ report, company }: VerdictViewProps) {
 
   // Helpers
   const decisionColors = verdict?.decision === "invest" 
-    ? "bg-status-pass text-black" 
-    : "bg-status-fail text-white";
+    ? "bg-[#00D4A0] text-black" 
+    : "bg-[#ef4444] text-white";
 
   const today = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).format(new Date());
 
@@ -37,21 +38,47 @@ export function VerdictView({ report, company }: VerdictViewProps) {
   const peRatio = financial?.metrics?.PERatio || financial?.metrics?.["P/E Ratio"] || "34.2x";
   const fcf = financial?.metrics?.FCF || financial?.metrics?.FreeCashFlow || "$14.9B";
 
-  // Map sources to cards
-  const sourceIcons = [FileText, Activity, Globe, BarChart3];
-  const sources = (research?.sources || []).map((name, i) => ({
-    name,
-    desc: ["Validated structural risk & debt profiles", "Sentiment mapped: 42 bullish, 3 bearish", "Relative performance benchmarking", "Real-time inventory levels analysis"][i % 4],
-    Icon: sourceIcons[i % 4],
-  }));
+  // Function to format source cards
+  const formatSourceCard = (url: string) => {
+    let domain = '';
+    try {
+      domain = new URL(url).hostname.replace('www.', '');
+    } catch {
+      domain = url.slice(0, 30);
+    }
+    
+    const iconType = 
+      domain.includes('bloomberg') || domain.includes('reuters') ? 'activity' :
+      domain.includes('sec.gov') || domain.includes('edgar') ? 'file-text' :
+      domain.includes('britannica') || domain.includes('wikipedia') ? 'book-open' :
+      url.includes('earnings') || url.includes('transcript') ? 'mic' :
+      domain.includes('globaldata') || domain.includes('marketcap') ? 'bar-chart-2' :
+      'globe';
+    
+    const path = url.split('/').filter(Boolean).pop() ?? '';
+    const subtitle = path
+      .replace(/-/g, ' ')
+      .replace(/\.(asp|html|htm|php)$/, '')
+      .slice(0, 50)
+      .replace(/\b\w/g, c => c.toUpperCase());
+    
+    const IconComponent = 
+      iconType === 'activity' ? Activity :
+      iconType === 'file-text' ? FileText :
+      iconType === 'book-open' ? BookOpen :
+      iconType === 'bar-chart-2' ? BarChart3 :
+      Globe;
+      
+    return {
+      title: domain,
+      subtitle: subtitle || 'Research source',
+      Icon: IconComponent
+    };
+  };
 
-  // Pad sources if < 4
-  while (sources.length < 4) {
-    sources.push({
-      name: ["Market Analysis", "Sector Benchmarks", "Historical Data", "Competitor Filings"][sources.length],
-      desc: "Real-time market data aggregation",
-      Icon: sourceIcons[sources.length % 4],
-    });
+  const formattedSources = (research?.sources || []).map(formatSourceCard);
+  while (formattedSources.length < 4) {
+    formattedSources.push(formatSourceCard("https://www.bloomberg.com/markets/research/q3-update"));
   }
 
   return (
@@ -60,13 +87,13 @@ export function VerdictView({ report, company }: VerdictViewProps) {
       <section id="verdict" className="flex flex-col md:flex-row items-center gap-8 scroll-mt-24">
         <div className="w-full md:w-[65%]">
           <div className="flex items-center gap-3 mb-6">
-            <span className="px-3 py-1 rounded-full border border-accent text-accent text-xs font-semibold tracking-wider uppercase">
+            <span className="px-3 py-1 rounded-full border border-[#00D4A0] text-[#00D4A0] text-xs font-semibold tracking-wider uppercase">
               INVESTMENT DECISION
             </span>
             <span className="text-text-muted text-xs">• Final Analysis Released {today}</span>
           </div>
           <h1 className="text-4xl md:text-[48px] leading-[1.1] font-bold text-white tracking-tight">
-            Definitive Investment Verdict: {company}
+            Definitive Investment Verdict: {formatCompanyName(company)}
           </h1>
         </div>
 
@@ -76,10 +103,10 @@ export function VerdictView({ report, company }: VerdictViewProps) {
               CONFIDENCE SCORE
             </span>
             <div className="flex items-start mb-6">
-              <span className="text-[64px] font-bold text-white leading-none tracking-tighter">{verdict?.confidence || 84}</span>
-              <span className="text-accent text-2xl font-bold mt-2">%</span>
+              <span className={cn("text-[64px] font-bold leading-none tracking-tighter", verdict?.decision === 'invest' ? 'text-[#00D4A0]' : 'text-[#ef4444]')}>{verdict?.confidence || 84}</span>
+              <span className={cn("text-2xl font-bold mt-2", verdict?.decision === 'invest' ? 'text-[#00D4A0]' : 'text-[#ef4444]')}>%</span>
             </div>
-            <div className={cn("w-full py-3 rounded-md text-center font-bold text-base uppercase", decisionColors)}>
+            <div className={cn("w-full py-3 rounded-md text-center font-bold text-base uppercase font-mono tracking-widest", decisionColors)}>
               {verdict?.decision || "INVEST"}
             </div>
           </div>
@@ -222,12 +249,12 @@ export function VerdictView({ report, company }: VerdictViewProps) {
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {sources.map((src, i) => (
-            <div key={i} className="bg-[#1a1a1a] border border-border rounded-md p-4 flex items-start gap-4">
-              <src.Icon className="w-5 h-5 text-text-muted mt-0.5" />
+          {formattedSources.map((src, i) => (
+            <div key={i} className="bg-[#1a1a1a] rounded-lg border border-[#222] p-4 flex items-start gap-3">
+              <src.Icon className="text-[#444] mt-0.5 shrink-0" size={16} />
               <div className="flex flex-col">
-                <span className="text-[13px] font-bold text-white">{src.name}</span>
-                <span className="text-[11px] text-text-muted">{src.desc}</span>
+                <span className="text-white text-sm font-medium">{src.title}</span>
+                <span className="text-[#555] text-xs mt-0.5 leading-relaxed">{src.subtitle}</span>
               </div>
             </div>
           ))}

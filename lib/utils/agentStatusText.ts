@@ -1,32 +1,55 @@
-import { AgentName, AgentStatus } from "@/hooks/useAnalysis";
-
-export function getAgentStatusText(agent: AgentName, status: AgentStatus, output: any, company: string = "Target"): string {
-  if (status === "idle") return "> Agent initialized.";
-  if (status === "error") return "> CRITICAL ERROR: Agent execution failed.";
-
-  if (status === "running") {
-    switch (agent) {
-      case "ResearchAgent": return `> Scanning global markets and indexing SEC EDGAR filings for ${company}...`;
-      case "FinancialAgent": return `> Ingesting 10-K and 10-Q documents. Calibrating DCF models...`;
-      case "SentimentAgent": return `> Scraping earnings call transcripts and analyst social sentiment...`;
-      case "RiskAgent": return `> Awaiting upstream inputs from Sentiment and Financials.`;
-      case "JudgeAgent": return `> Synthesizing multi-agent outputs to reach a final verdict...`;
-      case "ChallengeAgent": return `> Constructing the bear case to stress-test primary assumptions...`;
-      default: return `> Processing...`;
+export function getAgentStatusText(
+  agent: string,
+  status: 'idle' | 'running' | 'done' | 'error',
+  output: any,
+  company: string
+): string {
+  if (status === 'idle') return '> Agent initialized.'
+  
+  const texts: Record<string, Record<string, string>> = {
+    ResearchAgent: {
+      running: `> Scanning market data and indexing ${company} profile...`,
+      done: output?.products?.length
+        ? `> Analysis complete. ${output.products.length} products identified. Sector: ${output.sector || 'confirmed'}.`
+        : `> ${company} market positioning analysis complete.`,
+      error: '> Research agent encountered an error. Partial data retained.'
+    },
+    FinancialAgent: {
+      running: '> Ingesting financial statements and calibrating DCF model...',
+      done: output?.financialScore !== undefined
+        ? `> Financial score calibrated: ${output.financialScore}/100. ${output.revenueGrowth || ''}`
+        : '> Financial model complete.',
+      error: '> Financial data unavailable. Proceeding with estimates.'
+    },
+    SentimentAgent: {
+      running: '> Scraping earnings call transcripts and analyst social sentiment...',
+      done: output?.sentimentScore !== undefined
+        ? `> Sentiment mapped: ${output.bullSignals?.length || 0} bullish, ${output.bearSignals?.length || 0} bearish signals.`
+        : '> Sentiment analysis complete.',
+      error: '> Sentiment data limited. Using available signals.'
+    },
+    RiskAgent: {
+      running: '> Awaiting upstream inputs from Sentiment and Financials...',
+      done: output?.riskScore !== undefined
+        ? `> Risk matrix complete. Overall risk score: ${output.riskScore}/100.`
+        : '> Risk evaluation complete.',
+      error: '> Risk assessment incomplete. Default risk levels applied.'
+    },
+    JudgeAgent: {
+      running: '> Synthesizing committee inputs. Deliberating...',
+      done: output?.verdict
+        ? `> Verdict issued: ${output.verdict} at ${output.confidence}% confidence.`
+        : '> Committee verdict issued.',
+      error: '> Judge agent failed. Manual review required.'
+    },
+    ChallengeAgent: {
+      running: '> Running adversarial stress-test against primary verdict...',
+      done: output?.counterArguments?.length
+        ? `> ${output.counterArguments.length} counter-arguments generated. Devil's advocate complete.`
+        : '> Challenge analysis complete.',
+      error: '> Challenge agent failed. Proceeding without counterarguments.'
     }
   }
 
-  if (status === "done") {
-    switch (agent) {
-      case "ResearchAgent": return `> Analysis of ${company} market positioning finished. ${output?.metrics?.length || 4} key metrics extracted.`;
-      case "FinancialAgent": return `> 10-K and 10-Q ingestion complete. Financial trends mapped successfully.`;
-      case "SentimentAgent": return `> Sentiment aggregation complete. Institutional consensus is primarily ${output?.label || "neutral"}.`;
-      case "RiskAgent": return `> Risk modeling complete. Overall threat level assessed as ${output?.level || "MEDIUM"}.`;
-      case "JudgeAgent": return `> Verdict rendered: ${String(output?.decision || "PASS").toUpperCase()}. Confidence level: ${output?.confidence || 0}%.`;
-      case "ChallengeAgent": return `> Bear case generated. Weaknesses identified in primary thesis.`;
-      default: return `> Execution complete.`;
-    }
-  }
-
-  return "> Status unknown.";
+  return texts[agent]?.[status] ?? `> ${agent} ${status}.`
 }

@@ -1,6 +1,7 @@
 import React from "react";
 import { FinancialOutput } from "@/lib/graph/types";
 import { Card } from "./ui/Card";
+import { cn } from "@/lib/utils/cn";
 
 interface FinancialOverviewProps {
   financial: FinancialOutput | undefined;
@@ -11,60 +12,47 @@ export function FinancialOverview({ financial }: FinancialOverviewProps) {
 
   // Extract or fallback metrics
   const metrics = financial.metrics || {};
-  const revGrowth = metrics["Rev Growth"] || "265% YoY";
-  const profitability = metrics["NetIncome"] || metrics["Gross Margin"] || "76.0%";
-  const valuation = metrics["P/E Ratio"] || "72.4x";
-  const cashFlow = metrics["FCF"] || "$26.9B";
+  const revGrowth = metrics["Rev Growth"] || metrics["RevGrowth"] || "—";
+  const profitability = metrics["NetIncome"] || metrics["Gross Margin"] || metrics["GrossMargin"] || "—";
+  const valuation = metrics["P/E Ratio"] || metrics["PERatio"] || "—";
+  const cashFlow = metrics["FCF"] || metrics["FreeCashFlow"] || "—";
 
-  const score = (financial as any).score || 85; // Fallback score if missing in mock
+  const score = (financial as any).score || 85;
+
+  const rows = [
+    { label: 'Revenue Growth (YoY)', value: revGrowth, highlight: true },
+    { label: 'Gross Margin', value: profitability, highlight: false },
+    { label: 'P/E Ratio (FWD)', value: valuation, highlight: false },
+    { label: 'Free Cash Flow', value: cashFlow, highlight: true },
+  ];
 
   return (
-    <section className="space-y-4">
-      <h3 className="font-headline text-xl text-white">Financial Overview</h3>
-      <Card className="p-6 space-y-6">
-        
-        {/* 2x2 Metrics Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="space-y-1 bg-black/20 p-4 rounded-lg border border-white/5">
-            <span className="text-xs font-mono text-brand-outline uppercase">Revenue Growth</span>
-            <div className="text-xl font-bold text-white">{revGrowth}</div>
+    <div className="flex flex-col flex-1 h-full">
+      <div className="space-y-0">
+        {rows.map((row, i) => (
+          <div key={i} className="flex justify-between items-center py-3 border-b border-white/5 last:border-b-0">
+            <span className="text-[#666] text-xs">{row.label}</span>
+            <span className={cn("text-sm font-mono", row.highlight ? 'text-[#00D4A0]' : 'text-white')}>
+              {row.value}
+            </span>
           </div>
-          <div className="space-y-1 bg-black/20 p-4 rounded-lg border border-white/5">
-            <span className="text-xs font-mono text-brand-outline uppercase">Profitability</span>
-            <div className="text-xl font-bold text-white">{profitability}</div>
-          </div>
-          <div className="space-y-1 bg-black/20 p-4 rounded-lg border border-white/5">
-            <span className="text-xs font-mono text-brand-outline uppercase">Valuation</span>
-            <div className="text-xl font-bold text-white">{valuation}</div>
-          </div>
-          <div className="space-y-1 bg-black/20 p-4 rounded-lg border border-white/5">
-            <span className="text-xs font-mono text-brand-outline uppercase">Cash Flow</span>
-            <div className="text-xl font-bold text-white">{cashFlow}</div>
-          </div>
-        </div>
+        ))}
+      </div>
 
-        {/* Financial Score Bar */}
-        <div className="space-y-2 border-t border-white/5 pt-6">
-          <div className="flex justify-between items-end">
-            <span className="text-sm font-medium text-brand-on-surface-variant">Financial Strength Score</span>
-            <span className="text-2xl font-mono font-bold text-white">{score}<span className="text-sm text-brand-outline font-normal">/100</span></span>
-          </div>
-          <div className="h-2 w-full bg-black/40 rounded-full overflow-hidden">
-            <div 
-              className="h-full bg-accent rounded-full"
-              style={{ width: `${score}%` }}
-            />
-          </div>
+      <div className="mt-auto pt-6">
+        <div className="flex justify-between mb-2">
+          <span className="text-[#666] text-[10px] uppercase font-mono tracking-widest">Market Share</span>
+          <span className="text-white text-[10px] font-mono">
+            {score ? `${score}%` : '—'}
+          </span>
         </div>
-
-        {/* Analysis Paragraph */}
-        <div className="bg-brand-surface-variant/30 p-4 rounded-lg border border-white/5">
-          <p className="text-sm text-brand-on-surface-variant leading-relaxed">
-            {financial.analysis}
-          </p>
+        <div className="w-full h-[3px] bg-[#1a1a1a] rounded-full">
+          <div 
+            className="h-full bg-[#00D4A0] rounded-full transition-all duration-1000"
+            style={{ width: `${score ?? 0}%` }}
+          />
         </div>
-
-      </Card>
-    </section>
+      </div>
+    </div>
   );
 }

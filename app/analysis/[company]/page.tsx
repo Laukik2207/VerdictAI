@@ -7,6 +7,7 @@ import { AppShell } from "@/components/layout/AppShell";
 import { CompanySnapshotPanel } from "@/components/CompanySnapshotPanel";
 import { ResearchView } from "@/components/ResearchView";
 import { VerdictView } from "@/components/VerdictView";
+import { formatCompanyName } from "@/lib/utils/formatCompany";
 
 export default function AnalysisPage() {
   const params = useParams();
@@ -54,11 +55,11 @@ export default function AnalysisPage() {
 
   return (
     <AppShell 
-      company={company} 
+      company={formatCompanyName(company)} 
       isComplete={isComplete}
       rightPanel={
         <CompanySnapshotPanel 
-          company={company} 
+          company={formatCompanyName(company)} 
           researchOutput={(report?.research || agentOutputs.research) ?? null} 
         />
       }

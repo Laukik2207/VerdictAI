@@ -70,7 +70,7 @@ export default function ThesisPage() {
         setLogicMessages(prev => [...prev, { agent: "Agent Delta", text: `Counter: ${report.verdict?.thesis?.slice(0, 60) || "Strategic moat remains unchallenged."}...`, color: "text-[#6366f1]" }]);
       }, 1500);
       const t3 = setTimeout(() => {
-        setLogicMessages(prev => [...prev, { agent: "Agent Gamma", text: `Risk assessment: ${report.risk?.riskSummary?.slice(0, 50) || "Supply chain vulnerabilities exist."}...`, color: "text-[#f59e0b]" }]);
+        setLogicMessages(prev => [...prev, { agent: "Agent Gamma", text: `Risk assessment: ${report.risk?.operationalRisk?.slice(0, 50) || "Supply chain vulnerabilities exist."}...`, color: "text-[#f59e0b]" }]);
       }, 2500);
 
       return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); };

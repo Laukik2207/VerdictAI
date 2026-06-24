@@ -2,6 +2,7 @@ import React from "react";
 import { ResearchOutput } from "@/lib/graph/types";
 import { Info, ArrowUpRight, CheckCircle2, AlertTriangle } from "lucide-react";
 import { Skeleton } from "./ui/Skeleton";
+import { cn } from "@/lib/utils/cn";
 
 interface CompanySnapshotPanelProps {
   company: string;
@@ -11,18 +12,22 @@ interface CompanySnapshotPanelProps {
 export function CompanySnapshotPanel({ company, researchOutput }: CompanySnapshotPanelProps) {
   const isLoading = !researchOutput;
   
-  // Try to find Market Cap, P/E Ratio from metrics
-  const getMetric = (labelSubstring: string) => {
-    if (!researchOutput?.metrics) return null;
-    return researchOutput.metrics.find(m => m.label.toLowerCase().includes(labelSubstring))?.value;
-  };
-
-  const marketCap = getMetric("market cap") || "---";
-  const peRatio = getMetric("p/e") || "---";
+  const marketCap = researchOutput?.metrics?.find(m => m.label.toLowerCase().includes('market cap'))?.value 
+    ?? researchOutput?.metrics?.[0]?.value 
+    ?? "N/A";
+  const peRatio = researchOutput?.metrics?.find(m => m.label.toLowerCase().includes('p/e'))?.value 
+    ?? researchOutput?.metrics?.[1]?.value 
+    ?? "N/A";
   
   // Dummy 24H change and volatility for UI purposes
   const dailyChange = "+2.4%";
   const volatility = "High";
+
+  const insights = [
+    { Icon: ArrowUpRight, color: 'text-[#00D4A0]', text: researchOutput?.keyPoints?.[0] },
+    { Icon: CheckCircle2, color: 'text-[#00D4A0]', text: researchOutput?.keyPoints?.[1] },
+    { Icon: AlertTriangle, color: 'text-[#f59e0b]', text: researchOutput?.keyPoints?.[2] },
+  ].filter(i => i.text);
 
   return (
     <div className="p-5 flex flex-col h-full">
@@ -88,24 +93,24 @@ export function CompanySnapshotPanel({ company, researchOutput }: CompanySnapsho
           Quick Insights
         </h3>
         <div className="space-y-4">
-          <div className="flex items-start space-x-3">
-            <ArrowUpRight className="w-4 h-4 text-accent mt-0.5 flex-shrink-0" />
-            <div className="text-[13px] text-text-secondary leading-snug">
-              {isLoading ? <Skeleton variant="text" /> : (researchOutput.keyPoints?.[0] || "Revenue growth accelerating across core business units.")}
-            </div>
-          </div>
-          <div className="flex items-start space-x-3">
-            <CheckCircle2 className="w-4 h-4 text-accent mt-0.5 flex-shrink-0" />
-            <div className="text-[13px] text-text-secondary leading-snug">
-              {isLoading ? <Skeleton variant="text" /> : (researchOutput.keyPoints?.[1] || "Margin profile remains stable despite supply chain constraints.")}
-            </div>
-          </div>
-          <div className="flex items-start space-x-3">
-            <AlertTriangle className="w-4 h-4 text-status-pass mt-0.5 flex-shrink-0" />
-            <div className="text-[13px] text-text-secondary leading-snug">
-              {isLoading ? <Skeleton variant="text" /> : (researchOutput.keyPoints?.[2] || "Regulatory scrutiny increasing in key European markets.")}
-            </div>
-          </div>
+          {isLoading ? (
+            <>
+              <Skeleton variant="text" />
+              <Skeleton variant="text" />
+              <Skeleton variant="text" />
+            </>
+          ) : insights.length > 0 ? (
+            insights.map((insight, i) => (
+              <div key={i} className="flex items-start space-x-3">
+                <insight.Icon className={cn("w-4 h-4 mt-0.5 flex-shrink-0", insight.color)} />
+                <div className="text-[13px] text-text-secondary leading-snug line-clamp-2">
+                  {insight.text}
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="text-[13px] text-text-secondary">No quick insights available.</div>
+          )}
         </div>
       </div>
 

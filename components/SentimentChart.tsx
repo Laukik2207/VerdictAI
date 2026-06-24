@@ -7,20 +7,31 @@ interface SentimentChartProps {
 }
 
 export function SentimentChart({ bullSignals, bearSignals }: SentimentChartProps) {
-  // Generate visual-only data
-  // Green bars for positive signals, dark gray for negative
   const data: any[] = [];
+  const bulls = (bullSignals ?? []).slice(0, 3).map((_, i) => ({
+    name: `b${i}`,
+    value: 70 + Math.random() * 30, // vary heights
+    type: 'bull'
+  }))
+  const bears = (bearSignals ?? []).slice(0, 3).map((_, i) => ({
+    name: `r${i}`,
+    value: 30 + Math.random() * 40,
+    type: 'bear'
+  }))
   
-  bullSignals.slice(0, 3).forEach((s, i) => {
-    data.push({ name: `bull-${i}`, value: 60 + Math.random() * 40, type: 'bull' });
-  });
-  bearSignals.slice(0, 3).forEach((s, i) => {
-    data.push({ name: `bear-${i}`, value: 30 + Math.random() * 30, type: 'bear' });
-  });
-
-  // If there's missing data, pad it so chart doesn't look empty
-  while (data.length < 5) {
-    data.push({ name: `pad-${data.length}`, value: 50, type: 'neutral' });
+  // Interleave: bull, bear, bull, bear...
+  const max = Math.max(bulls.length, bears.length)
+  for (let i = 0; i < max; i++) {
+    if (bulls[i]) data.push(bulls[i])
+    if (bears[i]) data.push(bears[i])
+  }
+  
+  if (data.length === 0) {
+    return (
+      <div className="h-[140px] flex items-center justify-center text-[#444] text-xs font-mono">
+        Awaiting sentiment data...
+      </div>
+    );
   }
 
   return (
@@ -32,7 +43,7 @@ export function SentimentChart({ bullSignals, bearSignals }: SentimentChartProps
               {data.map((entry, index) => (
                 <Cell 
                   key={`cell-${index}`} 
-                  fill={entry.type === 'bull' ? '#00D4A0' : '#333333'} 
+                  fill={entry.type === 'bull' ? '#00D4A0' : '#2a2a2a'} 
                 />
               ))}
             </Bar>
