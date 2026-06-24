@@ -19,7 +19,7 @@ export function AppShell({ children, rightPanel, company, isComplete, microLabel
       <div className="flex flex-col flex-1 overflow-hidden relative">
         <TopNav company={company} showTabs={!isComplete} microLabel={microLabel} />
         <div className="flex flex-1 overflow-hidden">
-          <main className="flex-1 overflow-y-auto bg-bg-primary">
+          <main className="flex-1 overflow-y-auto scroll-hidden bg-bg-primary">
             {children}
           </main>
           {rightPanel && !isComplete && (

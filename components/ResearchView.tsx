@@ -188,7 +188,7 @@ export function ResearchView({ agentStatuses, agentOutputs, logEntries, company 
         </div>
         <div 
           ref={scrollRef}
-          className="flex-1 p-4 overflow-y-auto font-mono text-[12px] space-y-2 scroll-smooth"
+          className="flex-1 p-4 overflow-y-auto scroll-hidden font-mono text-[12px] space-y-2 scroll-smooth"
         >
           {logEntries.slice(-20).map((log) => {
             const isBold = /COMPLETE|DETECTED|CALIBRATED|CONFIRMED|VERDICT|ERROR/i.test(log.text);

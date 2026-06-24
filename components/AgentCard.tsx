@@ -60,7 +60,7 @@ export function AgentCard({ agentName, status, output, elapsedMs }: AgentCardPro
       <div
         className={cn(
           "transition-all duration-300 ease-in-out border-t border-white/5",
-          isExpanded ? "max-h-[800px] opacity-100 overflow-y-auto" : "max-h-0 opacity-0 overflow-hidden border-t-0"
+          isExpanded ? "max-h-[800px] opacity-100 overflow-y-auto scroll-hidden" : "max-h-0 opacity-0 overflow-hidden border-t-0"
         )}
       >
         <div className="p-4 bg-black/20">

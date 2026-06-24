@@ -37,7 +37,7 @@ export function DocumentSidebar({ company }: { company: string }) {
   ];
 
   return (
-    <aside className="hidden md:flex flex-col w-[280px] bg-bg-primary border-l border-border h-full flex-shrink-0 p-6 space-y-8 overflow-y-auto">
+    <aside className="hidden md:flex flex-col w-[280px] bg-bg-primary border-l border-border h-full flex-shrink-0 p-6 space-y-8 overflow-y-auto scroll-hidden">
       
       {/* SECTION A — DOCUMENT NAVIGATION */}
       <div className="flex flex-col space-y-4">

@@ -62,7 +62,7 @@ export default function ReportsPage() {
   return (
     <AppShell company={company} isComplete={true} rightPanel={<DocumentSidebar company={company} />}>
       {/* Container to enforce center alignment and padding */}
-      <div className="w-full h-full overflow-y-auto flex justify-center">
+      <div className="w-full h-full overflow-y-auto scroll-hidden flex justify-center">
         <ReportDocument report={report} company={company} />
       </div>
     </AppShell>

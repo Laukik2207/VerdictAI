@@ -351,7 +351,7 @@ export default function ThesisPage() {
               <div className="flex justify-between items-center mb-2 border-b border-white/5 pb-2">
                 <span className="font-mono text-[10px] text-text-muted uppercase">LOGIC STREAM</span>
               </div>
-              <div className="flex-1 overflow-y-auto max-h-[160px] space-y-2 pr-2 custom-scrollbar">
+              <div className="flex-1 overflow-y-auto max-h-[160px] space-y-2 pr-2 scroll-hidden">
                 {logicMessages.map((msg, idx) => (
                   <div key={idx} className="flex gap-2">
                     <span className={cn("text-[12px] font-bold whitespace-nowrap", msg.color)}>

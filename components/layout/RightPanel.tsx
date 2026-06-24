@@ -11,7 +11,7 @@ export function RightPanel({ children }: RightPanelProps) {
       <div className="absolute top-3 left-0 -ml-3 w-6 h-6 bg-bg-sidebar border border-border rounded-full flex items-center justify-center cursor-pointer hover:bg-white/5 transition-colors z-10">
         <ChevronRight className="w-3 h-3 text-text-secondary" />
       </div>
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto scroll-hidden">
         {children}
       </div>
     </aside>
