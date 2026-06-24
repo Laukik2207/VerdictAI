@@ -50,7 +50,7 @@ export function VerdictBanner(props: VerdictOutput) {
         <ul className="space-y-3">
           {(reasoning || []).map((point, idx) => (
             <li key={idx} className="flex items-start">
-              <span className="w-1.5 h-1.5 rounded-full bg-indigo mt-2 mr-3 flex-shrink-0" />
+              <span className="w-1.5 h-1.5 rounded-full bg-accent mt-2 mr-3 flex-shrink-0" />
               <span className="text-sm text-brand-on-surface-variant leading-relaxed">{point}</span>
             </li>
           ))}

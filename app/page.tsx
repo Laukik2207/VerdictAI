@@ -44,7 +44,7 @@ export default function HomePage() {
             )}
           >
             <span className="font-normal">Verdict</span>
-            <span className="font-bold text-indigo drop-shadow-[0_0_15px_rgba(59,130,246,0.3)]">AI</span>
+            <span className="font-bold text-accent drop-shadow-[0_0_15px_rgba(0,212,160,0.3)]">AI</span>
           </h1>
           
           <p 

@@ -21,8 +21,8 @@ export function ReportHeader({ company }: { company: string }) {
         </div>
       </div>
       <div className="flex items-center gap-2">
-        <span className="w-2 h-2 rounded-full bg-indigo animate-pulse" />
-        <span className="text-sm font-medium text-indigo">Powered by 6 AI Agents</span>
+        <span className="w-2 h-2 rounded-full bg-accent animate-pulse" />
+        <span className="text-sm font-medium text-accent">Powered by 6 AI Agents</span>
       </div>
     </header>
   );

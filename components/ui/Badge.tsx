@@ -10,7 +10,7 @@ export function Badge({ className, variant = "neutral", children, ...props }: Ba
     invest: "bg-verdict-invest/10 text-verdict-invest border-verdict-invest/20",
     pass: "bg-verdict-pass/10 text-verdict-pass border-verdict-pass/20",
     neutral: "bg-brand-surface-variant text-brand-on-surface border-white/10",
-    running: "bg-indigo/10 text-indigo border-indigo/20 animate-pulse",
+    running: "bg-accent/10 text-accent border-accent/20 animate-pulse",
   };
 
   return (

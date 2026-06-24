@@ -21,7 +21,7 @@ export function Spinner({ size = "md", className, ...props }: SpinnerProps) {
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
-      className={cn("animate-spin text-indigo", sizeClasses[size], className)}
+      className={cn("animate-spin text-accent", sizeClasses[size], className)}
       {...props}
     >
       <path d="M21 12a9 9 0 1 1-6.219-8.56" />

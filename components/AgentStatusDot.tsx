@@ -10,7 +10,7 @@ interface AgentStatusDotProps {
 export function AgentStatusDot({ status, className }: AgentStatusDotProps) {
   const statusColors = {
     idle: "bg-brand-surface-variant",
-    running: "bg-indigo animate-pulse",
+    running: "bg-accent animate-pulse",
     done: "bg-verdict-invest",
     error: "bg-brand-error",
   };

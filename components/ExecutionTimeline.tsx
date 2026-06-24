@@ -70,7 +70,7 @@ export function ExecutionTimeline({
               </div>
               <div className="flex-1 space-y-1.5">
                 <div className="flex items-center justify-between">
-                  <h3 className={cn("text-sm font-medium", isRunning ? "text-indigo animate-pulse" : "text-white")}>
+                  <h3 className={cn("text-sm font-medium", isRunning ? "text-accent animate-pulse" : "text-white")}>
                     {STEP_NAMES[step]}
                   </h3>
                   {isDone && elapsedMs[step] && (

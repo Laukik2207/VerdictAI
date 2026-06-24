@@ -9,7 +9,33 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        indigo: '#3B82F6',
+        accent: {
+          DEFAULT: '#00D4A0',
+          dim: 'rgba(0,212,160,0.15)',
+        },
+        bg: {
+          primary: '#0d0d0d',
+          card: '#141414',
+          'card-hover': '#1a1a1a',
+          sidebar: '#111111',
+        },
+        border: 'rgba(255,255,255,0.08)',
+        text: {
+          primary: '#ffffff',
+          secondary: '#888888',
+          muted: '#555555',
+        },
+        status: {
+          complete: '#00D4A0',
+          processing: '#00D4A0',
+          queued: '#444444',
+          invest: '#00D4A0',
+          pass: '#ef4444',
+        },
+        log: {
+          green: '#00D4A0',
+          dim: '#666666',
+        },
         brand: {
           surface: 'var(--color-surface)',
           'surface-dim': 'var(--color-surface-dim)',
@@ -60,14 +86,14 @@ const config: Config = {
           'surface-variant': 'var(--color-surface-variant)',
         },
         verdict: {
-          invest: '#10B981',
+          invest: '#00D4A0',
           pass: '#ef4444'
         }
       },
       fontFamily: {
         display: ['Inter', 'sans-serif'],
         body: ['Inter', 'sans-serif'],
-        mono: ['JetBrains Mono', 'monospace'],
+        mono: ['JetBrains Mono', 'Fira Code', 'monospace'],
       },
       borderRadius: {
         sm: '0.25rem',

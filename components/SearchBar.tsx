@@ -73,7 +73,7 @@ export function SearchBar() {
           className={cn(
             "w-full h-14 pl-6 pr-14 bg-black/20 border border-white/10 rounded-xl",
             "text-brand-on-background placeholder:text-brand-on-surface-variant/50 text-lg",
-            "focus:outline-none focus:border-indigo/50 focus:shadow-[0_0_15px_rgba(59,130,246,0.3)]",
+            "focus:outline-none focus:border-accent/50 focus:shadow-[0_0_15px_rgba(0,212,160,0.3)]",
             "transition-all duration-300 disabled:opacity-50",
             error && "border-brand-error focus:border-brand-error focus:shadow-none"
           )}
@@ -81,9 +81,9 @@ export function SearchBar() {
         <button
           type="submit"
           disabled={loading}
-          className="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-indigo hover:text-white hover:bg-indigo/20 rounded-lg transition-colors disabled:opacity-50 disabled:hover:bg-transparent disabled:hover:text-indigo"
+          className="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-accent hover:text-white hover:bg-accent/20 rounded-lg transition-colors disabled:opacity-50 disabled:hover:bg-transparent disabled:hover:text-accent"
         >
-          {loading ? <Spinner size="md" className="text-indigo" /> : <ArrowRight className="w-6 h-6" />}
+          {loading ? <Spinner size="md" className="text-accent" /> : <ArrowRight className="w-6 h-6" />}
         </button>
       </form>
       

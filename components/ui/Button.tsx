@@ -13,7 +13,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     const baseStyles = "inline-flex items-center justify-center font-medium transition-transform active:scale-98 disabled:opacity-50 disabled:pointer-events-none rounded";
     
     const variants = {
-      primary: "bg-indigo text-white hover:bg-opacity-90",
+      primary: "bg-accent text-white hover:bg-opacity-90",
       ghost: "bg-transparent text-brand-on-background hover:bg-brand-surface-variant",
       danger: "bg-transparent border border-brand-error text-brand-error hover:bg-brand-error hover:text-white",
     };

@@ -14,7 +14,7 @@ export function ProgressRing({
   value,
   size = 64,
   strokeWidth = 4,
-  colorClass = "text-indigo",
+  colorClass = "text-accent",
   className,
   ...props
 }: ProgressRingProps) {

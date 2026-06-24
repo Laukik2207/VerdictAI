@@ -51,7 +51,7 @@ export function FinancialOverview({ financial }: FinancialOverviewProps) {
           </div>
           <div className="h-2 w-full bg-black/40 rounded-full overflow-hidden">
             <div 
-              className="h-full bg-indigo rounded-full"
+              className="h-full bg-accent rounded-full"
               style={{ width: `${score}%` }}
             />
           </div>

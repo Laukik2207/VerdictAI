@@ -55,7 +55,7 @@ export function AnalysisReport({ report, company }: AnalysisReportProps) {
           <ul className="space-y-3 pt-4 border-t border-white/5">
             {(report.verdict?.reasoning || []).map((reason, i) => (
               <li key={i} className="flex gap-3 text-sm text-brand-on-surface-variant">
-                <span className="text-indigo mt-0.5">•</span>
+                <span className="text-accent mt-0.5">•</span>
                 <span>{reason}</span>
               </li>
             ))}
