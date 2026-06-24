@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { GraphState, AgentStatus, SSEEvent } from "@/lib/graph/types";
+import { GraphState, AgentStatus as GraphAgentStatus, SSEEvent } from "@/lib/graph/types";
 import { LogEntry, generateLogEntry } from "@/lib/utils/logFormatter";
 
 export type AgentName = 
@@ -9,6 +9,8 @@ export type AgentName =
   | "RiskAgent" 
   | "JudgeAgent" 
   | "ChallengeAgent";
+
+export type AgentStatus = "idle" | "running" | "done" | "error";
 
 export const AGENT_ORDER: AgentName[] = [
   "ResearchAgent",

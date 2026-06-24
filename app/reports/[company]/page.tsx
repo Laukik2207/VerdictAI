@@ -32,7 +32,7 @@ export default function ReportsPage() {
 
   if (loading) {
     return (
-      <AppShell company={company} rightPanel={<DocumentSidebar company={company} />}>
+      <AppShell company={company} isComplete={true} rightPanel={<DocumentSidebar company={company} />}>
         <div className="w-full flex justify-center items-center h-full">
           <div className="w-8 h-8 border-2 border-accent border-t-transparent rounded-full animate-spin"></div>
         </div>
@@ -42,7 +42,7 @@ export default function ReportsPage() {
 
   if (!report) {
     return (
-      <AppShell company={company} rightPanel={<DocumentSidebar company={company} />}>
+      <AppShell company={company} isComplete={true} rightPanel={<DocumentSidebar company={company} />}>
         <div className="w-full h-full flex flex-col justify-center items-center text-center p-8">
           <h2 className="text-2xl font-bold text-white mb-2">No report found</h2>
           <p className="text-text-secondary mb-8">Run an analysis first to generate an institutional report.</p>
@@ -60,7 +60,7 @@ export default function ReportsPage() {
   }
 
   return (
-    <AppShell company={company} rightPanel={<DocumentSidebar company={company} />}>
+    <AppShell company={company} isComplete={true} rightPanel={<DocumentSidebar company={company} />}>
       {/* Container to enforce center alignment and padding */}
       <div className="w-full h-full overflow-y-auto flex justify-center">
         <ReportDocument report={report} company={company} />

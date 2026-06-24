@@ -8,12 +8,19 @@ import { cn } from "@/lib/utils/cn";
 
 export function Sidebar() {
   const pathname = usePathname();
+  const [lastCompany, setLastCompany] = React.useState("");
+
+  React.useEffect(() => {
+    const saved = localStorage.getItem('verdictai_last_company');
+    if (saved) setLastCompany(saved);
+  }, []);
   
   // Try to extract company from pathname to preserve it across tabs
   const isReports = pathname?.startsWith("/reports/");
   const isAnalysis = pathname?.startsWith("/analysis/");
-  const match = pathname?.match(/\/(analysis|reports)\/(.+)/);
-  const company = match ? match[2] : "";
+  const isThesis = pathname?.startsWith("/thesis/");
+  const match = pathname?.match(/\/(analysis|reports|thesis)\/(.+)/);
+  const company = match ? match[2] : lastCompany;
 
   const navItems = [
     { label: "Research", icon: BarChart2, id: "research", href: `/analysis/${company}#research`, active: isAnalysis },

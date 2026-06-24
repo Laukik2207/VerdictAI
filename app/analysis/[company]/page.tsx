@@ -28,6 +28,7 @@ export default function AnalysisPage() {
   useEffect(() => {
     if (isComplete && report) {
       localStorage.setItem('verdictai_report_' + company, JSON.stringify(report));
+      localStorage.setItem('verdictai_last_company', company);
     }
   }, [isComplete, report, company]);
 

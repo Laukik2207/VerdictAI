@@ -9,16 +9,18 @@ import { cn } from "@/lib/utils/cn";
 interface TopNavProps {
   company: string;
   showTabs?: boolean;
+  microLabel?: React.ReactNode;
 }
 
-export function TopNav({ company, showTabs = true }: TopNavProps) {
+export function TopNav({ company, showTabs = true, microLabel }: TopNavProps) {
   const pathname = usePathname();
   const isReports = pathname?.startsWith("/reports/");
+  const isThesis = pathname?.startsWith("/thesis/");
   
   const tabs = [
-    { label: "Research", href: `/analysis/${company}`, active: !isReports },
+    { label: "Research", href: `/analysis/${company}`, active: !isReports && !isThesis },
     { label: "History", href: "#", active: false },
-    { label: "Thesis", href: "#", active: false },
+    { label: "Thesis", href: `/thesis/${company}`, active: isThesis },
     { label: "Reports", href: `/reports/${company}`, active: isReports }
   ];
 
@@ -53,6 +55,11 @@ export function TopNav({ company, showTabs = true }: TopNavProps) {
             $---
           </span>
         </div>
+        {microLabel && (
+          <div className="flex items-center ml-2 border-l border-border pl-3">
+            {microLabel}
+          </div>
+        )}
       </div>
 
       {/* Center Area: Tabs */}
