@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { GraphState, AgentStatus, SSEEvent } from "@/lib/graph/types";
+import { LogEntry, generateLogEntry } from "@/lib/utils/logFormatter";
 
 export type AgentName = 
   | "ResearchAgent" 
@@ -115,6 +116,7 @@ export function useAnalysis(company: string) {
   const [report, setReport] = useState<GraphState | null>(null);
   const [isComplete, setIsComplete] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [logEntries, setLogEntries] = useState<LogEntry[]>([]);
 
   const startMockTimeline = useCallback(() => {
     // Reset state
@@ -131,6 +133,7 @@ export function useAnalysis(company: string) {
     setReport(null);
     setIsComplete(false);
     setError(null);
+    setLogEntries([generateLogEntry("system", "start", null, company)]);
 
     const timeline = [
       { name: "ResearchAgent", start: 0, end: 1500, outputKey: "research", outputData: mockResearch },
@@ -147,6 +150,7 @@ export function useAnalysis(company: string) {
       timeouts.push(
         setTimeout(() => {
           setAgentStatuses(prev => ({ ...prev, [step.name as AgentName]: "running" }));
+          setLogEntries(prev => [...prev, generateLogEntry(step.name as AgentName, "agent_start", null, company)]);
         }, step.start)
       );
 
@@ -155,6 +159,7 @@ export function useAnalysis(company: string) {
           setAgentStatuses(prev => ({ ...prev, [step.name as AgentName]: "done" }));
           setAgentOutputs(prev => ({ ...prev, [step.outputKey]: step.outputData }));
           setElapsedMs(prev => ({ ...prev, [step.name as AgentName]: step.end - step.start }));
+          setLogEntries(prev => [...prev, generateLogEntry(step.name as AgentName, "agent_done", step.outputData, company)]);
         }, step.end)
       );
     });
@@ -163,6 +168,7 @@ export function useAnalysis(company: string) {
       setTimeout(() => {
         setIsComplete(true);
         setReport({ ...MOCK_REPORT, query: company });
+        setLogEntries(prev => [...prev, generateLogEntry("system", "done", null, company)]);
       }, 8100)
     );
 
@@ -196,6 +202,7 @@ export function useAnalysis(company: string) {
       setReport(null);
       setIsComplete(false);
       setError(null);
+      setLogEntries([generateLogEntry("system", "start", null, company)]);
 
       resetTimeout();
 
@@ -236,6 +243,7 @@ export function useAnalysis(company: string) {
 
                 if (eventName === "agent_start") {
                   setAgentStatuses((prev) => ({ ...prev, [agent]: "running" }));
+                  setLogEntries(prev => [...prev, generateLogEntry(agent, eventName, null, company)]);
                 } else if (eventName === "agent_done") {
                   setAgentStatuses((prev) => ({ ...prev, [agent]: "done" }));
                   setElapsedMs((prev) => ({ ...prev, [agent]: eventPayload.elapsedMs }));
@@ -252,14 +260,18 @@ export function useAnalysis(company: string) {
                   if (outputKey) {
                     setAgentOutputs((prev) => ({ ...prev, [outputKey]: eventPayload.output }));
                   }
+                  setLogEntries(prev => [...prev, generateLogEntry(agent, eventName, eventPayload.output, company)]);
                 } else if (eventName === "agent_error") {
                   setAgentStatuses((prev) => ({ ...prev, [agent]: "error" }));
+                  setLogEntries(prev => [...prev, generateLogEntry(agent, eventName, null, company)]);
                 } else if (eventName === "complete") {
                   setIsComplete(true);
                   setReport(eventPayload.report);
+                  setLogEntries(prev => [...prev, generateLogEntry("system", "done", null, company)]);
                   if (timeoutId) clearTimeout(timeoutId);
                 } else if (eventName === "error") {
                   setError(eventPayload.message || "Fatal pipeline error");
+                  setLogEntries(prev => [...prev, generateLogEntry("system", "error", null, company)]);
                   if (timeoutId) clearTimeout(timeoutId);
                   abortController.abort();
                 }
@@ -303,5 +315,6 @@ export function useAnalysis(company: string) {
     report,
     isComplete,
     error,
+    logEntries,
   };
 }
