@@ -10,10 +10,11 @@ export function FinancialOverview({ financial }: FinancialOverviewProps) {
   if (!financial) return null;
 
   // Extract or fallback metrics
-  const revGrowth = financial.metrics["Rev Growth"] || "265% YoY";
-  const profitability = financial.metrics["NetIncome"] || financial.metrics["Gross Margin"] || "76.0%";
-  const valuation = financial.metrics["P/E Ratio"] || "72.4x";
-  const cashFlow = financial.metrics["FCF"] || "$26.9B";
+  const metrics = financial.metrics || {};
+  const revGrowth = metrics["Rev Growth"] || "265% YoY";
+  const profitability = metrics["NetIncome"] || metrics["Gross Margin"] || "76.0%";
+  const valuation = metrics["P/E Ratio"] || "72.4x";
+  const cashFlow = metrics["FCF"] || "$26.9B";
 
   const score = (financial as any).score || 85; // Fallback score if missing in mock
 

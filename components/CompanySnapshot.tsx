@@ -36,7 +36,7 @@ export function CompanySnapshot(props: ResearchOutput) {
       <div>
         <h3 className="text-sm font-medium text-brand-on-background mb-3">Revenue Streams</h3>
         <div className="flex flex-wrap gap-2">
-          {revenueModel.map((model, idx) => (
+          {(revenueModel || []).map((model, idx) => (
             <Badge key={idx} variant="neutral">
               {model}
             </Badge>
@@ -48,10 +48,10 @@ export function CompanySnapshot(props: ResearchOutput) {
       <div>
         <h3 className="text-sm font-medium text-brand-on-background mb-3">Key Metrics</h3>
         <div className="grid grid-cols-2 gap-4">
-          {metrics.map((metric, idx) => (
+          {(metrics || []).map((metric, idx) => (
             <div key={idx} className="bg-black/20 rounded border border-white/5 p-4 flex flex-col justify-center">
-              <span className="text-xs font-mono text-brand-outline mb-1">{metric.label}</span>
-              <span className="text-lg font-medium text-brand-on-background">{metric.value}</span>
+              <span className="text-xs font-mono text-brand-outline mb-1">{metric?.label || ""}</span>
+              <span className="text-lg font-medium text-brand-on-background">{metric?.value || ""}</span>
             </div>
           ))}
         </div>

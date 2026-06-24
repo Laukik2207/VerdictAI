@@ -25,35 +25,35 @@ export function AnalysisReport({ report, company }: AnalysisReportProps) {
     return { animationDelay: `${index * 50}ms` };
   };
 
-  const baseAnim = "opacity-0 animate-in fade-in slide-in-from-bottom-4 fill-mode-forwards duration-500 ease-out";
+  const baseAnim = ""; // Removed opacity-0 and animate-in to debug invisibility issue
 
   return (
     <div className="w-full max-w-[900px] mx-auto flex flex-col gap-10 pb-20">
       
       {/* 1. Report Header */}
-      <div className={cn(baseAnim)} style={getStagger(0)}>
+      <div className={cn(baseAnim)}>
         <ReportHeader company={company} />
       </div>
 
       {/* 2. Company Snapshot */}
-      <div className={cn(baseAnim)} style={getStagger(2)}>
+      <div className={cn(baseAnim)}>
         {report.research && <CompanySnapshot {...report.research} />}
       </div>
 
       {/* 3. Verdict Banner (Dominant) */}
-      <div className={cn("opacity-0 animate-in fade-in zoom-in-95 fill-mode-forwards duration-700 ease-out")} style={getStagger(4)}>
+      <div className={cn(baseAnim)}>
         {report.verdict && <VerdictBanner {...report.verdict} />}
       </div>
 
       {/* 4. Investment Thesis Detail */}
-      <div className={cn(baseAnim, "space-y-4")} style={getStagger(5)}>
+      <div className={cn(baseAnim, "space-y-4")}>
         <h3 className="font-headline text-xl text-white">Investment Thesis</h3>
         <div className="bg-brand-surface-container-low border border-white/5 p-6 rounded-xl space-y-4">
           <p className="text-brand-on-surface-variant text-base leading-relaxed">
             {report.verdict?.rationale}
           </p>
           <ul className="space-y-3 pt-4 border-t border-white/5">
-            {report.verdict?.reasoning.map((reason, i) => (
+            {(report.verdict?.reasoning || []).map((reason, i) => (
               <li key={i} className="flex gap-3 text-sm text-brand-on-surface-variant">
                 <span className="text-indigo mt-0.5">•</span>
                 <span>{reason}</span>
@@ -64,33 +64,32 @@ export function AnalysisReport({ report, company }: AnalysisReportProps) {
       </div>
 
       {/* 5. Risk Board */}
-      <div className={cn(baseAnim)} style={getStagger(6)}>
-        {/* We need to pass risk score/level since RiskBoard expects score and level natively or via output */}
+      <div className={cn(baseAnim)}>
         {report.risk && <RiskBoard {...report.risk} />}
       </div>
 
       {/* 6. Market Sentiment Summary */}
-      <div className={cn(baseAnim)} style={getStagger(7)}>
+      <div className={cn(baseAnim)}>
         <SentimentSummary sentiment={report.sentiment} />
       </div>
 
       {/* 7. Financial Overview */}
-      <div className={cn(baseAnim)} style={getStagger(8)}>
+      <div className={cn(baseAnim)}>
         <FinancialOverview financial={report.financial} />
       </div>
 
       {/* 8. Devil's Advocate */}
-      <div className={cn(baseAnim)} style={getStagger(9)}>
+      <div className={cn(baseAnim)}>
         {report.challenge && <CounterArguments {...report.challenge} />}
       </div>
 
       {/* 9. Agent Transparency Panel */}
-      <div className={cn(baseAnim)} style={getStagger(10)}>
+      <div className={cn(baseAnim)}>
         <AgentTransparencyPanel report={report} />
       </div>
 
       {/* 10. Export Actions */}
-      <div className={cn(baseAnim, "pt-8 border-t border-white/10 flex justify-center")} style={getStagger(11)}>
+      <div className={cn(baseAnim, "pt-8 border-t border-white/10 flex justify-center")}>
         <ExportButton report={report} company={company} />
       </div>
 

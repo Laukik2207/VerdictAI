@@ -125,8 +125,17 @@ export default function AnalysisPage() {
           </>
         ) : (
           /* Report View (Centered) */
-          <div className="w-full flex justify-center animate-in fade-in zoom-in-95 duration-500 ease-out">
-            {report && <AnalysisReport report={report} company={company} />}
+          <div className="w-full flex justify-center mt-8">
+            {!report ? (
+              <div className="text-white text-2xl">DEBUG: REPORT IS NULL OR FALSY!</div>
+            ) : (
+              <div className="w-full flex flex-col gap-4">
+                 <AnalysisReport report={report} company={company} />
+                 <div className="text-white bg-black p-4 overflow-auto border border-red-500">
+                    DEBUG RAW REPORT: {report ? "PRESENT" : "MISSING"} | Keys: {Object.keys(report || {}).join(", ")}
+                 </div>
+              </div>
+            )}
           </div>
         )}
       </main>

@@ -288,8 +288,10 @@ export function useAnalysis(company: string) {
 
   useEffect(() => {
     if (isMock) {
+      // eslint-disable-next-line
       return startMockTimeline();
     } else {
+      // eslint-disable-next-line
       return startRealTimeline();
     }
   }, [isMock, startMockTimeline, startRealTimeline]);

@@ -32,7 +32,7 @@ export function CounterArguments(props: ChallengeOutput) {
         <div>
           <h3 className="text-xs font-mono text-brand-outline mb-4 uppercase">Key Friction Points</h3>
           <ol className="space-y-4">
-            {counterArguments.map((arg, idx) => (
+            {(counterArguments || []).map((arg, idx) => (
               <li key={idx} className="flex">
                 <span className="flex-shrink-0 flex items-center justify-center w-6 h-6 rounded-full bg-black/30 border border-white/10 text-xs font-mono text-brand-outline mr-4 mt-0.5">
                   {idx + 1}

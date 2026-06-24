@@ -4,7 +4,8 @@ import { ProgressRing } from "./ui/ProgressRing";
 
 export function VerdictBanner(props: VerdictOutput) {
   const { decision, rationale, confidence, thesis, reasoning, assumptions } = props;
-  const isInvest = decision === "invest";
+  const safeDecision = String(decision || "pass");
+  const isInvest = safeDecision === "invest";
 
   return (
     <div className="flex flex-col space-y-8 bg-brand-surface-container-low border border-white/10 rounded-xl p-8 overflow-hidden relative">
@@ -19,18 +20,18 @@ export function VerdictBanner(props: VerdictOutput) {
               isInvest ? "text-verdict-invest" : "text-verdict-pass"
             }`}
           >
-            {decision.toUpperCase()}
+            {safeDecision.toUpperCase()}
           </h1>
         </div>
         <div className="flex flex-col items-center">
           <ProgressRing
-            value={confidence}
+            value={confidence || 0}
             size={96}
             strokeWidth={8}
             colorClass={isInvest ? "text-verdict-invest" : "text-verdict-pass"}
           />
           <span className="mt-3 text-xs font-mono text-brand-outline">
-            {confidence}% Confidence
+            {confidence || 0}% Confidence
           </span>
         </div>
       </div>
@@ -47,7 +48,7 @@ export function VerdictBanner(props: VerdictOutput) {
       <div>
         <h3 className="text-sm font-medium text-brand-on-background mb-4">Core Reasoning</h3>
         <ul className="space-y-3">
-          {reasoning.map((point, idx) => (
+          {(reasoning || []).map((point, idx) => (
             <li key={idx} className="flex items-start">
               <span className="w-1.5 h-1.5 rounded-full bg-indigo mt-2 mr-3 flex-shrink-0" />
               <span className="text-sm text-brand-on-surface-variant leading-relaxed">{point}</span>
@@ -60,7 +61,7 @@ export function VerdictBanner(props: VerdictOutput) {
       <div className="pt-6 mt-2 border-t border-white/5">
         <h3 className="text-xs font-mono text-brand-outline mb-3 uppercase">Key Assumptions</h3>
         <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2">
-          {assumptions.map((assumption, idx) => (
+          {(assumptions || []).map((assumption, idx) => (
             <li key={idx} className="text-xs text-brand-outline-variant flex items-start">
               <span className="mr-2 opacity-50">•</span>
               {assumption}
