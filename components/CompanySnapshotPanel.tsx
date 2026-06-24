@@ -90,21 +90,21 @@ export function CompanySnapshotPanel({ company, researchOutput }: CompanySnapsho
         <div className="space-y-4">
           <div className="flex items-start space-x-3">
             <ArrowUpRight className="w-4 h-4 text-accent mt-0.5 flex-shrink-0" />
-            <p className="text-[13px] text-text-secondary leading-snug">
+            <div className="text-[13px] text-text-secondary leading-snug">
               {isLoading ? <Skeleton variant="text" /> : (researchOutput.keyPoints?.[0] || "Revenue growth accelerating across core business units.")}
-            </p>
+            </div>
           </div>
           <div className="flex items-start space-x-3">
             <CheckCircle2 className="w-4 h-4 text-accent mt-0.5 flex-shrink-0" />
-            <p className="text-[13px] text-text-secondary leading-snug">
+            <div className="text-[13px] text-text-secondary leading-snug">
               {isLoading ? <Skeleton variant="text" /> : (researchOutput.keyPoints?.[1] || "Margin profile remains stable despite supply chain constraints.")}
-            </p>
+            </div>
           </div>
           <div className="flex items-start space-x-3">
             <AlertTriangle className="w-4 h-4 text-status-pass mt-0.5 flex-shrink-0" />
-            <p className="text-[13px] text-text-secondary leading-snug">
+            <div className="text-[13px] text-text-secondary leading-snug">
               {isLoading ? <Skeleton variant="text" /> : (researchOutput.keyPoints?.[2] || "Regulatory scrutiny increasing in key European markets.")}
-            </p>
+            </div>
           </div>
         </div>
       </div>

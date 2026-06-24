@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useAnalysis } from "@/hooks/useAnalysis";
 import { AppShell } from "@/components/layout/AppShell";
@@ -24,6 +24,12 @@ export default function AnalysisPage() {
     error,
     logEntries,
   } = useAnalysis(company);
+
+  useEffect(() => {
+    if (isComplete && report) {
+      localStorage.setItem('verdictai_report_' + company, JSON.stringify(report));
+    }
+  }, [isComplete, report, company]);
 
   if (error) {
     return (

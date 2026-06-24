@@ -1,15 +1,27 @@
+"use client";
+
 import React from "react";
 import Link from "next/link";
-import { Plus, BarChart2, DollarSign, MessageSquare, AlertTriangle, Gavel, HelpCircle, Archive } from "lucide-react";
+import { usePathname } from "next/navigation";
+import { Plus, BarChart2, DollarSign, MessageSquare, AlertTriangle, Gavel, FileText, HelpCircle, Archive } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 
 export function Sidebar() {
+  const pathname = usePathname();
+  
+  // Try to extract company from pathname to preserve it across tabs
+  const isReports = pathname?.startsWith("/reports/");
+  const isAnalysis = pathname?.startsWith("/analysis/");
+  const match = pathname?.match(/\/(analysis|reports)\/(.+)/);
+  const company = match ? match[2] : "";
+
   const navItems = [
-    { label: "Research", icon: BarChart2, id: "research" },
-    { label: "Financials", icon: DollarSign, id: "financial" },
-    { label: "Sentiment", icon: MessageSquare, id: "sentiment" },
-    { label: "Risk", icon: AlertTriangle, id: "risk" },
-    { label: "Verdict", icon: Gavel, id: "verdict", active: true },
+    { label: "Research", icon: BarChart2, id: "research", href: `/analysis/${company}#research`, active: isAnalysis },
+    { label: "Financials", icon: DollarSign, id: "financial", href: `/analysis/${company}#financials`, active: isAnalysis },
+    { label: "Sentiment", icon: MessageSquare, id: "sentiment", href: `/analysis/${company}#sentiment`, active: isAnalysis },
+    { label: "Risk", icon: AlertTriangle, id: "risk", href: `/analysis/${company}#risk`, active: isAnalysis },
+    { label: "Verdict", icon: Gavel, id: "verdict", href: `/analysis/${company}#verdict`, active: isAnalysis },
+    { label: "Reports", icon: FileText, id: "reports", href: `/reports/${company}`, active: isReports },
   ];
 
   const bottomItems = [
@@ -48,18 +60,19 @@ export function Sidebar() {
       {/* Nav Links */}
       <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-1">
         {navItems.map((item) => (
-          <button
-            key={item.id}
-            className={cn(
-              "w-full flex items-center space-x-3 h-10 px-3 rounded-md text-xs font-medium transition-colors group",
-              item.active
-                ? "bg-accent/10 border-l-2 border-accent text-accent"
-                : "text-text-secondary hover:bg-white/5 hover:text-text-primary border-l-2 border-transparent"
-            )}
-          >
-            <item.icon className={cn("w-4 h-4", item.active ? "text-accent" : "text-text-muted group-hover:text-text-primary")} />
-            <span>{item.label}</span>
-          </button>
+          <Link key={item.id} href={company ? item.href : "#"}>
+            <button
+              className={cn(
+                "w-full flex items-center space-x-3 h-10 px-3 rounded-md text-xs font-medium transition-colors group",
+                item.active
+                  ? "bg-accent/10 border-l-2 border-accent text-accent"
+                  : "text-text-secondary hover:bg-white/5 hover:text-text-primary border-l-2 border-transparent"
+              )}
+            >
+              <item.icon className={cn("w-4 h-4", item.active ? "text-accent" : "text-text-muted group-hover:text-text-primary")} />
+              <span>{item.label}</span>
+            </button>
+          </Link>
         ))}
       </nav>
 

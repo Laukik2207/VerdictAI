@@ -1,4 +1,8 @@
+"use client";
+
 import React from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Bell, Settings, ArrowRightLeft, Download } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 
@@ -8,7 +12,29 @@ interface TopNavProps {
 }
 
 export function TopNav({ company, showTabs = true }: TopNavProps) {
-  const tabs = ["Research", "History", "Thesis", "Reports"];
+  const pathname = usePathname();
+  const isReports = pathname?.startsWith("/reports/");
+  
+  const tabs = [
+    { label: "Research", href: `/analysis/${company}`, active: !isReports },
+    { label: "History", href: "#", active: false },
+    { label: "Thesis", href: "#", active: false },
+    { label: "Reports", href: `/reports/${company}`, active: isReports }
+  ];
+
+  const handleExport = () => {
+    // If we're on the reports page, we can trigger the same export logic
+    // For now we just retrieve from localStorage
+    const data = localStorage.getItem('verdictai_report_' + company);
+    if (data) {
+      const blob = new Blob([data], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `verdict-${company.toLowerCase()}-report.json`;
+      a.click();
+    }
+  };
 
   return (
     <header className="flex items-center justify-between h-[52px] w-full bg-bg-sidebar border-b border-border px-4 flex-shrink-0">
@@ -34,18 +60,19 @@ export function TopNav({ company, showTabs = true }: TopNavProps) {
         {showTabs ? (
           <div className="flex space-x-8 h-full">
             {tabs.map((tab, idx) => (
-              <button
-                key={idx}
-                className={cn(
-                  "relative h-full flex items-center text-sm font-medium transition-colors",
-                  idx === 0 ? "text-text-primary" : "text-text-secondary hover:text-text-primary"
-                )}
-              >
-                {tab}
-                {idx === 0 && (
+              <Link key={idx} href={tab.href} className="relative h-full flex items-center">
+                <button
+                  className={cn(
+                    "text-sm font-medium transition-colors",
+                    tab.active ? "text-text-primary" : "text-text-secondary hover:text-text-primary"
+                  )}
+                >
+                  {tab.label}
+                </button>
+                {tab.active && (
                   <span className="absolute bottom-0 left-0 w-full h-[2px] bg-text-primary rounded-t-sm" />
                 )}
-              </button>
+              </Link>
             ))}
           </div>
         ) : (
@@ -62,7 +89,10 @@ export function TopNav({ company, showTabs = true }: TopNavProps) {
             <ArrowRightLeft className="w-3.5 h-3.5" />
             <span>Compare</span>
           </button>
-          <button className="flex items-center space-x-1.5 h-8 px-3 rounded text-xs font-medium bg-white text-black hover:bg-white/90 transition-colors">
+          <button 
+            onClick={handleExport}
+            className="flex items-center space-x-1.5 h-8 px-3 rounded text-xs font-medium bg-white text-black hover:bg-white/90 transition-colors"
+          >
             <Download className="w-3.5 h-3.5" />
             <span>Export</span>
           </button>
