@@ -87,7 +87,9 @@ export async function POST(req: NextRequest) {
         // 2. Financial
         emit("agent_start", { agent: "FinancialAgent", timestamp: Date.now() });
         const t1 = Date.now();
-        state.financial = await runFinancialAgent(state.research!);
+        const financialRes = await runFinancialAgent(company, state.research!);
+        state.financial = financialRes.output;
+        state.alphaVantage = financialRes.alphaVantage;
         if ((state.financial as any).error) {
            state.errors?.push((state.financial as any).error);
            emit("agent_error", { agent: "FinancialAgent", message: (state.financial as any).error });
@@ -97,7 +99,9 @@ export async function POST(req: NextRequest) {
         // 3. Sentiment
         emit("agent_start", { agent: "SentimentAgent", timestamp: Date.now() });
         const t2 = Date.now();
-        state.sentiment = await runSentimentAgent(company, state.research!);
+        const sentimentRes = await runSentimentAgent(company, state.research!);
+        state.sentiment = sentimentRes.output;
+        state.newsArticles = sentimentRes.newsArticles;
         if ((state.sentiment as any).error) {
            state.errors?.push((state.sentiment as any).error);
            emit("agent_error", { agent: "SentimentAgent", message: (state.sentiment as any).error });
@@ -127,7 +131,7 @@ export async function POST(req: NextRequest) {
         // 6. Challenge
         emit("agent_start", { agent: "ChallengeAgent", timestamp: Date.now() });
         const t5 = Date.now();
-        state.challenge = await runChallengeAgent(state);
+        state.challenge = await runChallengeAgent(state.verdict!, state);
         if ((state.challenge as any).error) {
            state.errors?.push((state.challenge as any).error);
            emit("agent_error", { agent: "ChallengeAgent", message: (state.challenge as any).error });

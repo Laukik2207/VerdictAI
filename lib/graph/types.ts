@@ -61,6 +61,8 @@ export interface GraphState {
   risk?: RiskOutput;
   verdict?: VerdictOutput;
   challenge?: ChallengeOutput;
+  newsArticles?: any[];
+  alphaVantage?: any;
   status: AgentStatus;
   error?: string;
   errors?: string[];

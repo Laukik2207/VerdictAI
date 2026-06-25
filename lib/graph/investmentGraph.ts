@@ -41,6 +41,12 @@ export const GraphStateAnnotation = Annotation.Root({
   challenge: Annotation<ChallengeOutput>({
     reducer: (x, y) => y ?? x,
   }),
+  newsArticles: Annotation<any[]>({
+    reducer: (x, y) => y ?? x,
+  }),
+  alphaVantage: Annotation<any>({
+    reducer: (x, y) => y ?? x,
+  }),
   status: Annotation<AgentStatus>({
     reducer: (x, y) => y ?? x,
     default: () => "idle",
@@ -63,16 +69,16 @@ async function researchNode(state: typeof GraphStateAnnotation.State): Promise<P
 
 async function financialNode(state: typeof GraphStateAnnotation.State): Promise<Partial<GraphState>> {
   if (!state.research) throw new Error("Research state missing before Financial node.");
-  const output = await runFinancialAgent(state.research);
+  const { output, alphaVantage } = await runFinancialAgent(state.query, state.research);
   const errors = (output as any).error ? [(output as any).error] : undefined;
-  return { financial: output, errors };
+  return { financial: output, alphaVantage, errors };
 }
 
 async function sentimentNode(state: typeof GraphStateAnnotation.State): Promise<Partial<GraphState>> {
   if (!state.research) throw new Error("Research state missing before Sentiment node.");
-  const output = await runSentimentAgent(state.query, state.research);
+  const { output, newsArticles } = await runSentimentAgent(state.query, state.research);
   const errors = (output as any).error ? [(output as any).error] : undefined;
-  return { sentiment: output, errors };
+  return { sentiment: output, newsArticles, errors };
 }
 
 async function riskNode(state: typeof GraphStateAnnotation.State): Promise<Partial<GraphState>> {
@@ -88,7 +94,8 @@ async function judgeNode(state: typeof GraphStateAnnotation.State): Promise<Part
 }
 
 async function challengeNode(state: typeof GraphStateAnnotation.State): Promise<Partial<GraphState>> {
-  const output = await runChallengeAgent(state);
+  if (!state.verdict) throw new Error("Verdict state missing before Challenge node.");
+  const output = await runChallengeAgent(state.verdict, state);
   const errors = (output as any).error ? [(output as any).error] : undefined;
   return { challenge: output, errors };
 }

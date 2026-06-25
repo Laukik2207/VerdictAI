@@ -1,39 +1,41 @@
-import { GraphState, ChallengeOutput } from "../graph/types";
-import { ChatOpenAI } from "@langchain/openai";
+import { GraphState, ChallengeOutput, VerdictOutput } from "../graph/types";
+import { getModel } from "../services/modelRouter";
 import { buildChallengePrompt } from "../prompts/challengePrompt";
 import { parseAgentJson } from "../utils/parseAgentJson";
 import { logLlmInteraction } from "../utils/logger";
 
-export async function runChallengeAgent(state: Partial<GraphState>): Promise<ChallengeOutput> {
-  const verdict = state.verdict;
+export async function runChallengeAgent(verdict: VerdictOutput, state: Partial<GraphState>): Promise<ChallengeOutput> {
   if (!verdict) {
     return {
-      counterVerdict: "Unknown",
+      counterVerdict: "Pass",
       weakestAssumption: "Unknown",
-      alternativeThesis: "Unknown",
-      counterArguments: ["Analysis incomplete: missing verdict"],
-      weaknesses: ["Unknown"],
-      finalAdjustments: "Unknown",
-      ...({ error: "Missing verdict" } as any),
+      alternativeThesis: "N/A",
+      counterArguments: ["No verdict provided to challenge"],
+      weaknesses: [],
+      finalAdjustments: "None",
     };
   }
 
   let prompt = buildChallengePrompt(verdict, state);
-  
-  // Temperature override: 0.7
-  const creativeLlm = new ChatOpenAI({
-    modelName: "openai/gpt-4o-mini",
-    temperature: 0.7,
-    apiKey: process.env.OPENROUTER_API_KEY,
-    configuration: {
-      baseURL: "https://openrouter.ai/api/v1",
-      defaultHeaders: { "HTTP-Referer": "http://localhost:3000", "X-Title": "VerdictAI" },
-    },
-  });
+
+  const devilLlm = getModel("challenge");
 
   const executor = async () => {
-    const res = await creativeLlm.invoke(prompt);
-    let data = parseAgentJson<ChallengeOutput>(res.content as string, "ChallengeAgent");
+    const startTime = Date.now();
+    const res = await devilLlm.invoke(prompt);
+    const latency = Date.now() - startTime;
+
+    const outputStr = res.content as string;
+    const tokens = Math.floor(outputStr.length / 4);
+
+    let data = parseAgentJson<ChallengeOutput>(outputStr, "ChallengeAgent");
+
+    logLlmInteraction("challenge_agent", prompt, outputStr, {
+      provider: "gemini-1.5-pro",
+      tokens,
+      latency,
+      costEstimate: 0,
+    });
 
     if (!Array.isArray(data.counterArguments) || data.counterArguments.length < 3) {
       throw new Error("CounterArguments must be an array with at least 3 items");
@@ -52,14 +54,24 @@ export async function runChallengeAgent(state: Partial<GraphState>): Promise<Cha
 
   try {
     try {
-      const result = await executor();
-      logLlmInteraction("challenge_agent", prompt, result);
-      return result;
+      return await executor();
     } catch (err: any) {
-      prompt = prompt + "\n\nCRITICAL REMINDER: You MUST return valid JSON. 'counterArguments' MUST have at least 3 items. 'weakestAssumption' and 'alternativeThesis' MUST be non-empty strings.";
-      const retryResult = await executor();
-      logLlmInteraction("challenge_agent", prompt, retryResult);
-      return retryResult;
+      prompt = prompt + "\n\nCRITICAL REMINDER: You MUST return valid JSON exactly matching the schema. Do not include markdown formatting.";
+      
+      const retryStartTime = Date.now();
+      const res = await devilLlm.invoke(prompt);
+      const retryLatency = Date.now() - retryStartTime;
+      const retryOutputStr = res.content as string;
+      const retryTokens = Math.floor(retryOutputStr.length / 4);
+
+      logLlmInteraction("challenge_agent_retry", prompt, retryOutputStr, {
+        provider: "gemini-1.5-pro",
+        tokens: retryTokens,
+        latency: retryLatency,
+        costEstimate: 0,
+      });
+
+      return parseAgentJson<ChallengeOutput>(retryOutputStr, "ChallengeAgent");
     }
   } catch (error: any) {
     const fallback: ChallengeOutput = {
@@ -71,7 +83,7 @@ export async function runChallengeAgent(state: Partial<GraphState>): Promise<Cha
       finalAdjustments: "None",
       ...({ error: `Challenge agent failed: ${error.message}` } as any),
     };
-    logLlmInteraction("challenge_agent", prompt, fallback);
+    logLlmInteraction("challenge_agent_error", prompt, fallback);
     return fallback;
   }
 }

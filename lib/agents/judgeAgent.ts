@@ -1,5 +1,5 @@
 import { GraphState, VerdictOutput } from "../graph/types";
-import { ChatOpenAI } from "@langchain/openai";
+import { getModel } from "../services/modelRouter";
 import { buildJudgePrompt } from "../prompts/judgePrompt";
 import { parseAgentJson } from "../utils/parseAgentJson";
 import { logLlmInteraction } from "../utils/logger";
@@ -7,20 +7,24 @@ import { logLlmInteraction } from "../utils/logger";
 export async function runJudgeAgent(state: Partial<GraphState>): Promise<VerdictOutput> {
   let prompt = buildJudgePrompt(state);
   
-  // Temperature override: 0.2
-  const decisiveLlm = new ChatOpenAI({
-    modelName: "openai/gpt-4o-mini",
-    temperature: 0.2,
-    apiKey: process.env.OPENROUTER_API_KEY,
-    configuration: {
-      baseURL: "https://openrouter.ai/api/v1",
-      defaultHeaders: { "HTTP-Referer": "http://localhost:3000", "X-Title": "VerdictAI" },
-    },
-  });
+  const decisiveLlm = getModel("judge");
 
   const executor = async () => {
+    const startTime = Date.now();
     const res = await decisiveLlm.invoke(prompt);
-    let data = parseAgentJson<VerdictOutput>(res.content as string, "JudgeAgent");
+    const latency = Date.now() - startTime;
+    
+    const outputStr = res.content as string;
+    const tokens = Math.floor(outputStr.length / 4);
+
+    let data = parseAgentJson<VerdictOutput>(outputStr, "JudgeAgent");
+
+    logLlmInteraction("judge_agent", prompt, outputStr, {
+      provider: "gemini-1.5-pro",
+      tokens,
+      latency,
+      costEstimate: 0,
+    });
 
     if (data.decision) {
       const upper = data.decision.toUpperCase();
@@ -52,15 +56,25 @@ export async function runJudgeAgent(state: Partial<GraphState>): Promise<Verdict
 
   try {
     try {
-      const result = await executor();
-      logLlmInteraction("judge_agent", prompt, result);
-      return result;
+      return await executor();
     } catch (err: any) {
       // Retry once with explicit instruction
       prompt = prompt + "\n\nCRITICAL REMINDER: You MUST return valid JSON. 'decision' MUST be exactly 'invest' or 'pass'. 'reasoning' MUST have at least 2 items. 'assumptions' MUST have at least 1 item.";
-      const retryResult = await executor();
-      logLlmInteraction("judge_agent", prompt, retryResult);
-      return retryResult;
+      
+      const retryStartTime = Date.now();
+      const res = await decisiveLlm.invoke(prompt);
+      const retryLatency = Date.now() - retryStartTime;
+      const retryOutputStr = res.content as string;
+      const retryTokens = Math.floor(retryOutputStr.length / 4);
+      
+      logLlmInteraction("judge_agent_retry", prompt, retryOutputStr, {
+        provider: "gemini-1.5-pro",
+        tokens: retryTokens,
+        latency: retryLatency,
+        costEstimate: 0,
+      });
+
+      return parseAgentJson<VerdictOutput>(retryOutputStr, "JudgeAgent");
     }
   } catch (error: any) {
     const fallback: VerdictOutput = {
@@ -72,7 +86,7 @@ export async function runJudgeAgent(state: Partial<GraphState>): Promise<Verdict
       assumptions: ["System error occurred"],
       ...({ error: `Judge agent failed: ${error.message}` } as any),
     };
-    logLlmInteraction("judge_agent", prompt, fallback);
+    logLlmInteraction("judge_agent_error", prompt, fallback);
     return fallback;
   }
 }

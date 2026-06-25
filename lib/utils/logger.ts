@@ -1,7 +1,12 @@
 import fs from "fs";
 import path from "path";
 
-export function logLlmInteraction(agentName: string, input: any, output: any) {
+export function logLlmInteraction(
+  agentName: string, 
+  input: any, 
+  output: any, 
+  meta?: { provider?: string; tokens?: number; latency?: number; costEstimate?: number }
+) {
   try {
     const logDir = path.join(process.cwd(), "llm_logs");
     if (!fs.existsSync(logDir)) {
@@ -14,6 +19,10 @@ export function logLlmInteraction(agentName: string, input: any, output: any) {
     const logData = {
       agent: agentName,
       timestamp: new Date().toISOString(),
+      provider: meta?.provider || "unknown",
+      tokens: meta?.tokens || 0,
+      latency: meta?.latency ? `${meta.latency}ms` : "unknown",
+      costEstimate: meta?.costEstimate || 0,
       input,
       output,
     };
