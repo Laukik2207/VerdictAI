@@ -3,8 +3,9 @@
 import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Bell, Settings, ArrowRightLeft, Download } from "lucide-react";
+import { Download, ArrowRightLeft, Settings, Bell } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
+import { CompanyMarketBadge } from "@/components/CompanyMarketBadge";
 
 interface TopNavProps {
   company: string;
@@ -47,14 +48,9 @@ export function TopNav({ company, showTabs = true, microLabel }: TopNavProps) {
           {company.charAt(0).toUpperCase()}
         </div>
         <span className="text-sm font-bold text-text-primary">{company}</span>
-        <div className="flex items-center space-x-2">
-          <span className="px-1.5 py-0.5 rounded bg-white/10 text-text-secondary text-[10px] font-mono uppercase">
-            NASDAQ
-          </span>
-          <span className="text-xs font-mono text-accent">
-            $---
-          </span>
-        </div>
+        
+        <CompanyMarketBadge company={company} />
+
         {microLabel && (
           <div className="flex items-center ml-2 border-l border-border pl-3">
             {microLabel}
