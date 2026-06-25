@@ -2,12 +2,14 @@
 
 import React from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { Plus, BarChart2, DollarSign, MessageSquare, AlertTriangle, Gavel, FileText, HelpCircle, Archive } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
+import { AgentName, AgentStatus } from "@/hooks/useAnalysis";
 
-export function Sidebar() {
+export function Sidebar({ agentStatuses }: { agentStatuses?: Record<AgentName, AgentStatus> }) {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const [lastCompany, setLastCompany] = React.useState("");
 
   React.useEffect(() => {
@@ -15,19 +17,33 @@ export function Sidebar() {
     if (saved) setLastCompany(saved);
   }, []);
   
-  // Try to extract company from pathname to preserve it across tabs
   const isReports = pathname?.startsWith("/reports/");
   const isAnalysis = pathname?.startsWith("/analysis/");
-  const isThesis = pathname?.startsWith("/thesis/");
   const match = pathname?.match(/\/(analysis|reports|thesis)\/(.+)/);
   const company = match ? match[2] : lastCompany;
+  const activeTab = searchParams?.get("tab") ?? "research";
+
+  const getStatus = (tabId: string) => {
+    if (!agentStatuses) return "idle";
+    switch (tabId) {
+      case "research": return agentStatuses.ResearchAgent;
+      case "financials": return agentStatuses.FinancialAgent;
+      case "sentiment": return agentStatuses.SentimentAgent;
+      case "risk": return agentStatuses.RiskAgent;
+      case "verdict": 
+        if (agentStatuses.JudgeAgent === "running" || agentStatuses.ChallengeAgent === "running") return "running";
+        if (agentStatuses.JudgeAgent === "done" && agentStatuses.ChallengeAgent === "done") return "done";
+        return "idle";
+      default: return "idle";
+    }
+  };
 
   const navItems = [
-    { label: "Research", icon: BarChart2, id: "research", href: `/analysis/${company}#research`, active: isAnalysis },
-    { label: "Financials", icon: DollarSign, id: "financial", href: `/analysis/${company}#financials`, active: isAnalysis },
-    { label: "Sentiment", icon: MessageSquare, id: "sentiment", href: `/analysis/${company}#sentiment`, active: isAnalysis },
-    { label: "Risk", icon: AlertTriangle, id: "risk", href: `/analysis/${company}#risk`, active: isAnalysis },
-    { label: "Verdict", icon: Gavel, id: "verdict", href: `/analysis/${company}#verdict`, active: isAnalysis },
+    { label: "Research", icon: BarChart2, id: "research", href: `/analysis/${company}?tab=research`, active: isAnalysis && activeTab === "research" },
+    { label: "Financials", icon: DollarSign, id: "financials", href: `/analysis/${company}?tab=financials`, active: isAnalysis && activeTab === "financials" },
+    { label: "Sentiment", icon: MessageSquare, id: "sentiment", href: `/analysis/${company}?tab=sentiment`, active: isAnalysis && activeTab === "sentiment" },
+    { label: "Risk", icon: AlertTriangle, id: "risk", href: `/analysis/${company}?tab=risk`, active: isAnalysis && activeTab === "risk" },
+    { label: "Verdict", icon: Gavel, id: "verdict", href: `/analysis/${company}?tab=verdict`, active: isAnalysis && activeTab === "verdict" },
     { label: "Reports", icon: FileText, id: "reports", href: `/reports/${company}`, active: isReports },
   ];
 
@@ -66,21 +82,34 @@ export function Sidebar() {
 
       {/* Nav Links */}
       <nav className="flex-1 overflow-y-auto scroll-hidden py-4 px-3 space-y-1">
-        {navItems.map((item) => (
-          <Link key={item.id} href={company ? item.href : "#"}>
-            <button
-              className={cn(
-                "w-full flex items-center space-x-3 h-10 px-3 rounded-md text-xs font-medium transition-colors group",
-                item.active
-                  ? "bg-accent/10 border-l-2 border-accent text-accent"
-                  : "text-text-secondary hover:bg-white/5 hover:text-text-primary border-l-2 border-transparent"
-              )}
-            >
-              <item.icon className={cn("w-4 h-4", item.active ? "text-accent" : "text-text-muted group-hover:text-text-primary")} />
-              <span>{item.label}</span>
-            </button>
-          </Link>
-        ))}
+        {navItems.map((item) => {
+          const status = getStatus(item.id);
+          return (
+            <Link key={item.id} href={company ? item.href : "#"}>
+              <button
+                className={cn(
+                  "w-full flex items-center justify-between h-10 px-3 rounded-md text-xs font-medium transition-colors group",
+                  item.active
+                    ? "bg-accent/10 border-l-2 border-accent text-accent"
+                    : "text-text-secondary hover:bg-white/5 hover:text-text-primary border-l-2 border-transparent"
+                )}
+              >
+                <div className="flex items-center space-x-3">
+                  <item.icon className={cn("w-4 h-4", item.active ? "text-accent" : "text-text-muted group-hover:text-text-primary")} />
+                  <span>{item.label}</span>
+                </div>
+                {item.id !== "reports" && isAnalysis && (
+                  <div className={cn(
+                    "w-1.5 h-1.5 rounded-full flex-shrink-0",
+                    status === "done" && "bg-[#00D4A0]",
+                    status === "running" && "bg-[#00D4A0] animate-pulse",
+                    status === "idle" && "bg-[#333]"
+                  )} />
+                )}
+              </button>
+            </Link>
+          );
+        })}
       </nav>
 
       {/* Bottom Links */}

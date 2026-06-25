@@ -6,7 +6,7 @@ import { LogEntry } from "@/lib/utils/logFormatter";
 import { getAgentStatusText } from "@/lib/utils/agentStatusText";
 import { cn } from "@/lib/utils/cn";
 
-interface ResearchViewProps {
+interface ResearchTabProps {
   agentStatuses: Record<AgentName, AgentStatus>;
   agentOutputs: Partial<GraphState>;
   elapsedMs: Record<AgentName, number>;
@@ -22,7 +22,7 @@ const STEPS = [
   { id: "JudgeAgent", label: "VERDICT", icon: Gavel },
 ];
 
-export function ResearchView({ agentStatuses, agentOutputs, logEntries, company }: ResearchViewProps) {
+export function ResearchTab({ agentStatuses, agentOutputs, logEntries, company }: ResearchTabProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   // Auto-scroll the log container

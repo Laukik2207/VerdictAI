@@ -1,17 +1,17 @@
 import React, { useEffect } from "react";
 import { GraphState } from "@/lib/graph/types";
-import { SentimentChart } from "./SentimentChart";
+import { SentimentChart } from "../SentimentChart";
 import { generatePillarLabel } from "@/lib/utils/thesisLabels";
 import { formatCompanyName } from "@/lib/utils/formatCompany";
 import { Download, FileText, BarChart3, Globe, Activity, TrendingDown, TrendingUp, BookOpen } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 
-interface VerdictViewProps {
+interface VerdictTabProps {
   report: GraphState;
   company: string;
 }
 
-export function VerdictView({ report, company }: VerdictViewProps) {
+export function VerdictTab({ report, company }: VerdictTabProps) {
   const { research, financial, sentiment, risk, verdict, challenge } = report;
 
   // Scroll to hash on mount if present
@@ -280,7 +280,7 @@ export function VerdictView({ report, company }: VerdictViewProps) {
           <button 
             className="flex items-center justify-center gap-2 w-full md:w-[200px] bg-white text-black py-3 rounded-md hover:bg-gray-200 transition-colors"
             onClick={() => {
-              // TODO: Wire up actual JSON export as per existing logic
+              // Wire up actual JSON export as per existing logic
               const blob = new Blob([JSON.stringify(report, null, 2)], { type: "application/json" });
               const url = URL.createObjectURL(blob);
               const a = document.createElement("a");
