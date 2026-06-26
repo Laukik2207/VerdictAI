@@ -1,4 +1,4 @@
-import { llmFlash, llmJudge, llmChallenge } from "./providers/gemini";
+import { getLlmFlash, getLlmJudge, getLlmChallenge } from "./providers/gemini";
 
 export type TaskType = "research" | "financial" | "sentiment" | "risk" | "judge" | "challenge";
 
@@ -8,12 +8,12 @@ export function getModel(task: TaskType) {
     case "financial":
     case "sentiment":
     case "risk":
-      return llmFlash;
+      return getLlmFlash();
     case "judge":
-      return llmJudge;
+      return getLlmJudge();
     case "challenge":
-      return llmChallenge;
+      return getLlmChallenge();
     default:
-      return llmFlash; // Fallback
+      return getLlmFlash(); // Fallback
   }
 }

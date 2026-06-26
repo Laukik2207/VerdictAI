@@ -1,7 +1,8 @@
 import { ChatOpenAI } from "@langchain/openai";
 
-const openRouterConfig = {
+const getOpenRouterConfig = () => ({
   apiKey: process.env.OPENROUTER_API_KEY,
+  openAIApiKey: process.env.OPENROUTER_API_KEY,
   configuration: {
     baseURL: "https://openrouter.ai/api/v1",
     defaultHeaders: {
@@ -9,22 +10,25 @@ const openRouterConfig = {
       "X-Title": "VerdictAI",
     },
   },
-};
+});
 
-export const llmFlash = new ChatOpenAI({
-  modelName: "google/gemini-1.5-flash",
+export const getLlmFlash = () => new ChatOpenAI({
+  modelName: "google/gemini-2.5-flash",
   temperature: 0.3,
-  ...openRouterConfig,
+  maxTokens: 1000,
+  ...getOpenRouterConfig(),
 });
 
-export const llmJudge = new ChatOpenAI({
-  modelName: "google/gemini-1.5-pro",
+export const getLlmJudge = () => new ChatOpenAI({
+  modelName: "google/gemini-2.5-flash",
   temperature: 0.1,
-  ...openRouterConfig,
+  maxTokens: 1000,
+  ...getOpenRouterConfig(),
 });
 
-export const llmChallenge = new ChatOpenAI({
-  modelName: "google/gemini-1.5-pro",
+export const getLlmChallenge = () => new ChatOpenAI({
+  modelName: "google/gemini-2.5-flash",
   temperature: 0.7,
-  ...openRouterConfig,
+  maxTokens: 1000,
+  ...getOpenRouterConfig(),
 });
