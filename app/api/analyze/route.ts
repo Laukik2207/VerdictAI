@@ -68,6 +68,54 @@ export async function POST(req: NextRequest) {
       };
 
       try {
+        // --- CACHE CHECK ---
+        const normalizedCompany = company.toLowerCase();
+        let cachedReport: GraphState | null = null;
+        
+        try {
+          const { prisma } = await import("@/lib/services/db");
+          const cacheRecord = await prisma.analysisCache.findUnique({
+            where: { company: normalizedCompany }
+          });
+          
+          if (cacheRecord) {
+            // Check if fresh (e.g., < 24 hours old)
+            const ageMs = Date.now() - new Date(cacheRecord.updatedAt).getTime();
+            if (ageMs < 24 * 60 * 60 * 1000) {
+              cachedReport = JSON.parse(cacheRecord.data) as GraphState;
+            }
+          }
+        } catch (dbErr) {
+          console.warn("Database cache read failed:", dbErr);
+        }
+
+        if (cachedReport) {
+          // Replay cached data sequentially for UI effect
+          const agents = [
+            { name: "ResearchAgent", key: "research" },
+            { name: "FinancialAgent", key: "financial" },
+            { name: "SentimentAgent", key: "sentiment" },
+            { name: "RiskAgent", key: "risk" },
+            { name: "JudgeAgent", key: "verdict" },
+            { name: "ChallengeAgent", key: "challenge" },
+          ];
+
+          for (const agent of agents) {
+            emit("agent_start", { agent: agent.name, timestamp: Date.now() });
+            await new Promise(r => setTimeout(r, 200)); // Small UI delay
+            emit("agent_done", { 
+              agent: agent.name, 
+              output: (cachedReport as any)[agent.key] || {}, 
+              elapsedMs: 200 
+            });
+          }
+          
+          emit("complete", { report: cachedReport });
+          controller.close();
+          return;
+        }
+        // --- END CACHE CHECK ---
+
         const state: GraphState = { 
           query: company,
           status: "running",
@@ -151,6 +199,19 @@ export async function POST(req: NextRequest) {
         emit("agent_done", { agent: "ChallengeAgent", output: state.challenge, elapsedMs: Date.now() - t5 });
 
         state.status = "done";
+        
+        // --- SAVE TO CACHE ---
+        try {
+          const { prisma } = await import("@/lib/services/db");
+          await prisma.analysisCache.upsert({
+            where: { company: normalizedCompany },
+            update: { data: JSON.stringify(state) },
+            create: { company: normalizedCompany, data: JSON.stringify(state) }
+          });
+        } catch (dbErr) {
+          console.warn("Database cache write failed:", dbErr);
+        }
+        
         emit("complete", { report: state });
         controller.close();
       } catch (err: any) {

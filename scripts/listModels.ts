@@ -1,4 +1,4 @@
-import fetch from "node-fetch";
+// Using native fetch
 
 async function main() {
   const res = await fetch("https://openrouter.ai/api/v1/models");
