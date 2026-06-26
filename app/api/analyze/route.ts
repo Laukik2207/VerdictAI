@@ -84,39 +84,51 @@ export async function POST(req: NextRequest) {
         }
         emit("agent_done", { agent: "ResearchAgent", output: state.research, elapsedMs: Date.now() - t0 });
 
-        // 2. Financial
+        // 2, 3, 4. Financial, Sentiment, Risk (Parallel)
         emit("agent_start", { agent: "FinancialAgent", timestamp: Date.now() });
-        const t1 = Date.now();
-        const financialRes = await runFinancialAgent(company, state.research!);
+        emit("agent_start", { agent: "SentimentAgent", timestamp: Date.now() });
+        emit("agent_start", { agent: "RiskAgent", timestamp: Date.now() });
+
+        const [financialRes, sentimentRes, riskRes] = await Promise.all([
+          (async () => {
+            const t1 = Date.now();
+            const res = await runFinancialAgent(company, state.research!);
+            if ((res.output as any).error) {
+               state.errors?.push((res.output as any).error);
+               emit("agent_error", { agent: "FinancialAgent", message: (res.output as any).error });
+            }
+            emit("agent_done", { agent: "FinancialAgent", output: res.output, elapsedMs: Date.now() - t1 });
+            return res;
+          })(),
+          (async () => {
+            const t2 = Date.now();
+            const res = await runSentimentAgent(company, state.research!);
+            if ((res.output as any).error) {
+               state.errors?.push((res.output as any).error);
+               emit("agent_error", { agent: "SentimentAgent", message: (res.output as any).error });
+            }
+            emit("agent_done", { agent: "SentimentAgent", output: res.output, elapsedMs: Date.now() - t2 });
+            return res;
+          })(),
+          (async () => {
+            const t3 = Date.now();
+            const res = await runRiskAgent(company, state.research!);
+            if ((res as any).error) {
+               state.errors?.push((res as any).error);
+               emit("agent_error", { agent: "RiskAgent", message: (res as any).error });
+            }
+            emit("agent_done", { agent: "RiskAgent", output: res, elapsedMs: Date.now() - t3 });
+            return res;
+          })()
+        ]);
+
         state.financial = financialRes.output;
         state.alphaVantage = financialRes.alphaVantage;
-        if ((state.financial as any).error) {
-           state.errors?.push((state.financial as any).error);
-           emit("agent_error", { agent: "FinancialAgent", message: (state.financial as any).error });
-        }
-        emit("agent_done", { agent: "FinancialAgent", output: state.financial, elapsedMs: Date.now() - t1 });
-
-        // 3. Sentiment
-        emit("agent_start", { agent: "SentimentAgent", timestamp: Date.now() });
-        const t2 = Date.now();
-        const sentimentRes = await runSentimentAgent(company, state.research!);
+        
         state.sentiment = sentimentRes.output;
         state.newsArticles = sentimentRes.newsArticles;
-        if ((state.sentiment as any).error) {
-           state.errors?.push((state.sentiment as any).error);
-           emit("agent_error", { agent: "SentimentAgent", message: (state.sentiment as any).error });
-        }
-        emit("agent_done", { agent: "SentimentAgent", output: state.sentiment, elapsedMs: Date.now() - t2 });
-
-        // 4. Risk
-        emit("agent_start", { agent: "RiskAgent", timestamp: Date.now() });
-        const t3 = Date.now();
-        state.risk = await runRiskAgent(state);
-        if ((state.risk as any).error) {
-           state.errors?.push((state.risk as any).error);
-           emit("agent_error", { agent: "RiskAgent", message: (state.risk as any).error });
-        }
-        emit("agent_done", { agent: "RiskAgent", output: state.risk, elapsedMs: Date.now() - t3 });
+        
+        state.risk = riskRes;
 
         // 5. Judge
         emit("agent_start", { agent: "JudgeAgent", timestamp: Date.now() });

@@ -1,12 +1,11 @@
-import { GraphState } from "../graph/types";
+import { ResearchOutput } from "../graph/types";
 
-export function buildRiskPrompt(state: Partial<GraphState>): string {
-  return `You are the Risk Evaluation Agent on an AI Investment Committee.
-You have access to all prior agent reports.
+export function buildRiskPrompt(company: string, research: ResearchOutput): string {
+  return `You are the Risk Evaluation Agent on an AI Investment Committee analyzing ${company}.
+You have access to the Research Agent's report.
 
-Research Summary: ${state.research?.summary}
-Financial Trend: ${state.financial?.trend}
-Sentiment Label: ${state.sentiment?.label}
+Research Summary: ${research.summary}
+Key Points: ${research.keyPoints.join("; ")}
 
 Your mandate: identify the vulnerabilities in this investment thesis.
 Focus on:

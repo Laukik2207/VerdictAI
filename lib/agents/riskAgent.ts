@@ -1,12 +1,12 @@
-import { GraphState, RiskOutput } from "../graph/types";
+import { ResearchOutput, RiskOutput } from "../graph/types";
 import { getModel } from "../services/modelRouter";
 import { buildRiskPrompt } from "../prompts/riskPrompt";
 import { parseAgentJson } from "../utils/parseAgentJson";
 import { withRetry } from "../utils/retry";
 import { logLlmInteraction } from "../utils/logger";
 
-export async function runRiskAgent(state: Partial<GraphState>): Promise<RiskOutput> {
-  const prompt = buildRiskPrompt(state);
+export async function runRiskAgent(company: string, research: ResearchOutput): Promise<RiskOutput> {
+  const prompt = buildRiskPrompt(company, research);
   const llm = getModel("risk");
 
   const executor = async () => {

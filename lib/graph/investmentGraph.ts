@@ -82,7 +82,8 @@ async function sentimentNode(state: typeof GraphStateAnnotation.State): Promise<
 }
 
 async function riskNode(state: typeof GraphStateAnnotation.State): Promise<Partial<GraphState>> {
-  const output = await runRiskAgent(state);
+  if (!state.research) throw new Error("Research state missing before Risk node.");
+  const output = await runRiskAgent(state.query, state.research);
   const errors = (output as any).error ? [(output as any).error] : undefined;
   return { risk: output, errors };
 }
